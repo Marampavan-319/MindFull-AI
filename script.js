@@ -37,13 +37,24 @@ const pageStorageKey = "mindfullCarrier.lastPage";
 const pageReturnStorageKey = "mindfullCarrier.pageBeforeAuth";
 const assessmentStateKey = "mindfullCarrier.assessmentState";
 
+// Scope personal demo data to the currently signed-in account.
+// This is client-side separation for the prototype, not a security boundary.
+function getUserScopedStorageKey(baseKey) {
+  let accountId = "guest";
+  try {
+    const session = JSON.parse(localStorage.getItem("mindfullCarrier.prototypeSession") || "null");
+    if (session && session.email) accountId = String(session.email).trim().toLowerCase();
+  } catch (error) { /* Use the guest namespace when no session is available. */ }
+  return baseKey + "::account::" + encodeURIComponent(accountId);
+}
+
 function saveCurrentPage(page) {
   try { localStorage.setItem(pageStorageKey, page); } catch (error) { /* Page still works if storage is disabled. */ }
 }
 
 function saveAssessmentState(resultsVisible = false) {
   try {
-    localStorage.setItem(assessmentStateKey, JSON.stringify({
+    localStorage.setItem(getUserScopedStorageKey(assessmentStateKey), JSON.stringify({
       selectedCategory,
       currentQuestionIndex,
       answers,
@@ -811,7 +822,7 @@ function showMentors() {
 
 function readSavedBookings() {
   try {
-    const stored = localStorage.getItem(bookingStorageKey);
+    const stored = localStorage.getItem(getUserScopedStorageKey(bookingStorageKey));
     const parsed = stored ? JSON.parse(stored) : [];
     return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
@@ -832,7 +843,7 @@ function removeExpiredUnpaidBookings() {
     }
   });
   if (changed) {
-    try { localStorage.setItem(bookingStorageKey, JSON.stringify(bookings)); } catch (error) { /* Recheck expiry on the next visit if storage is unavailable. */ }
+    try { localStorage.setItem(getUserScopedStorageKey(bookingStorageKey), JSON.stringify(bookings)); } catch (error) { /* Recheck expiry on the next visit if storage is unavailable. */ }
   }
   return bookings;
 }
@@ -865,7 +876,7 @@ function renderHistory() {
   if (activeHistoryType === "partnership") {
     let inquiries = [];
     try {
-      const saved = JSON.parse(localStorage.getItem(partnershipInquiryStorageKey) || "[]");
+      const saved = JSON.parse(localStorage.getItem(getUserScopedStorageKey(partnershipInquiryStorageKey)) || "[]");
       inquiries = Array.isArray(saved) ? saved : [];
     } catch (error) { inquiries = []; }
     inquiries.sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0));
@@ -1058,7 +1069,7 @@ bookingForm.addEventListener("submit", (event) => {
   const bookings = readSavedBookings();
   bookings.unshift(booking);
   try {
-    localStorage.setItem(bookingStorageKey, JSON.stringify(bookings.slice(0, 100)));
+    localStorage.setItem(getUserScopedStorageKey(bookingStorageKey), JSON.stringify(bookings.slice(0, 100)));
   } catch (error) {
     showToast("Your browser could not save this request. Check storage settings and try again.");
     return;
@@ -1085,7 +1096,7 @@ function expirePendingBooking(id) {
     expired.status = "expired";
     expired.expiredAt = Date.now();
   }
-  try { localStorage.setItem(bookingStorageKey, JSON.stringify(remaining)); } catch (error) { /* The expiry is checked again when the page next loads. */ }
+  try { localStorage.setItem(getUserScopedStorageKey(bookingStorageKey), JSON.stringify(remaining)); } catch (error) { /* The expiry is checked again when the page next loads. */ }
   if (paymentCountdownInterval) window.clearInterval(paymentCountdownInterval);
   paymentCountdownInterval = null;
   activePendingBookingId = null;
@@ -1157,7 +1168,7 @@ completeDemoPaymentButton.addEventListener("click", () => {
   booking.status = "paid";
   booking.paidAt = Date.now();
   try {
-    localStorage.setItem(bookingStorageKey, JSON.stringify(bookings));
+    localStorage.setItem(getUserScopedStorageKey(bookingStorageKey), JSON.stringify(bookings));
   } catch (error) {
     showToast("Could not save the demo payment status. Please try again.");
     return;
@@ -1296,7 +1307,7 @@ function restoreAppPage(page) {
   }
   if (page === "assessment") {
     let saved = null;
-    try { saved = JSON.parse(localStorage.getItem(assessmentStateKey) || "null"); } catch (error) { saved = null; }
+    try { saved = JSON.parse(localStorage.getItem(getUserScopedStorageKey(assessmentStateKey)) || "null"); } catch (error) { saved = null; }
     if (!saved || !questionSets[saved.selectedCategory]) {
       showView("guidance");
       return;
@@ -1448,7 +1459,7 @@ const partnershipStatusLabels = { new: "New", reviewing: "Reviewing", contacted:
 
 function readPartnershipInquiries() {
   try {
-    const saved = JSON.parse(localStorage.getItem(partnershipInquiryStorageKey) || "[]");
+    const saved = JSON.parse(localStorage.getItem(getUserScopedStorageKey(partnershipInquiryStorageKey)) || "[]");
     if (!Array.isArray(saved)) return [];
     let changed = false;
     saved.forEach((inquiry) => {
@@ -1456,14 +1467,14 @@ function readPartnershipInquiries() {
       if (!partnershipStatusLabels[inquiry.status]) { inquiry.status = "new"; changed = true; }
       if (!inquiry.updatedAt) { inquiry.updatedAt = Number(inquiry.createdAt || inquiry.id || Date.now()); changed = true; }
     });
-    if (changed) localStorage.setItem(partnershipInquiryStorageKey, JSON.stringify(saved));
+    if (changed) localStorage.setItem(getUserScopedStorageKey(partnershipInquiryStorageKey), JSON.stringify(saved));
     return saved;
   } catch (error) { return []; }
 }
 
 function savePartnershipInquiries(inquiries) {
   try {
-    localStorage.setItem(partnershipInquiryStorageKey, JSON.stringify(inquiries.slice(0, 50)));
+    localStorage.setItem(getUserScopedStorageKey(partnershipInquiryStorageKey), JSON.stringify(inquiries.slice(0, 50)));
     return true;
   } catch (error) {
     showToast("Could not save the inquiry update. Check browser storage and try again.");
@@ -1795,10 +1806,10 @@ partnershipInquiryForm.addEventListener("submit", (event) => {
   }
   let saved = [];
   try {
-    saved = JSON.parse(localStorage.getItem(partnershipInquiryStorageKey) || "[]");
+    saved = JSON.parse(localStorage.getItem(getUserScopedStorageKey(partnershipInquiryStorageKey)) || "[]");
     if (!Array.isArray(saved)) saved = [];
     saved.unshift(inquiry);
-    localStorage.setItem(partnershipInquiryStorageKey, JSON.stringify(saved.slice(0, 50)));
+    localStorage.setItem(getUserScopedStorageKey(partnershipInquiryStorageKey), JSON.stringify(saved.slice(0, 50)));
   } catch (error) {
     partnershipFeedback.textContent = "This browser could not save your inquiry. Check storage settings and try again.";
     return;
