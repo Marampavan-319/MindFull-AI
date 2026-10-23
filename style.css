@@ -293,3 +293,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--teal); outline-
   .booking-goal { grid-column: auto; }
   .booking-actions > button { flex: 1; }
 }
+
+.payment-countdown { margin: 14px 0; padding: 12px 14px; border-radius: 10px; background: #fff7ed; color: #9a3412 !important; font-weight: 750; font-variant-numeric: tabular-nums; }
+.payment-countdown.is-expired { background: #fef2f2; color: #b91c1c !important; }
+.payment-countdown.is-paid { background: #ecfdf5; color: #047857 !important; }
