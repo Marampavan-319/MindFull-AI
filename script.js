@@ -873,6 +873,23 @@ function startPaymentCountdown(id) {
 }
 
 completeDemoPaymentButton.addEventListener("click", () => {
+  // Demo-account users must sign in or create a personal account before continuing to payment.
+  let currentSession = null;
+  try {
+    currentSession = JSON.parse(localStorage.getItem(authSessionKey) || "null");
+  } catch (error) {
+    currentSession = null;
+  }
+  if (currentSession && currentSession.demo) {
+    try { localStorage.removeItem(authSessionKey); } catch (error) { /* Keep the sign-in gate visible even if storage is unavailable. */ }
+    authScreen.hidden = false;
+    signoutButton.hidden = true;
+    showAuthMode("signin");
+    setAuthFeedback(signinFeedback, "To continue with payment, please sign in to your account or create a new account. Demo accounts cannot complete payments.");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+
   if (!activePendingBookingId) return;
   const bookings = readSavedBookings();
   const booking = bookings.find((saved) => saved.id === activePendingBookingId && saved.status === "pending");
