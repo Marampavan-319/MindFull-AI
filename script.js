@@ -467,33 +467,162 @@ document.querySelector("#close-chat").addEventListener("click", () => {
   chatToggle.focus();
 });
 
+let pendingChatFollowUp = null;
+let chatContext = { topic: null, goal: null };
+
+function getFollowUpReply(text) {
+  if (!pendingChatFollowUp) return null;
+
+  const pending = pendingChatFollowUp;
+  const normalized = text.toLowerCase().trim();
+  let reply = null;
+
+  if (pending === "roadmap-goal") {
+    if (/intern|job|employment|placement|interview/.test(normalized)) {
+      chatContext = { topic: "roadmap", goal: "job or internship" };
+      reply = "Great—your job/internship roadmap is: (1) choose one target role, (2) identify 3 skills from real job descriptions, (3) build or polish one relevant project, (4) prepare a one-page resume and project explanation, and (5) apply to a small, relevant shortlist each week. Which role are you targeting?";
+      pendingChatFollowUp = "target-role";
+    } else if (/skill|project|coding|program|web|python|sql|portfolio/.test(normalized)) {
+      chatContext = { topic: "roadmap", goal: "skills and projects" };
+      reply = "Let's focus on skills and projects: pick one skill, practise it for 30–45 minutes a day, build one small project using it, test the main feature, and document what you learned. Which skill do you want to focus on first—web development, Python, SQL, or something else?";
+      pendingChatFollowUp = "skill-focus";
+    } else if (/higher|study|master|research|m.?tech|m.?s\b/.test(normalized)) {
+      chatContext = { topic: "roadmap", goal: "higher studies" };
+      reply = "For higher studies, start by choosing a subject area, compare 3 programs by curriculum and eligibility, verify entrance requirements on official sites, and make a preparation/funding plan. Which subject or specialization interests you?";
+      pendingChatFollowUp = "study-field";
+    } else if (/government|govt|exam|civil|bank|railway/.test(normalized)) {
+      chatContext = { topic: "roadmap", goal: "government exams" };
+      reply = "For government exams, shortlist exams that match your qualification, verify age and eligibility from official notifications, map the syllabus, and start a steady routine with practice and revision. Which exam or job category are you considering?";
+      pendingChatFollowUp = "exam-target";
+    } else if (/business|entrepreneur|startup|own|company/.test(normalized)) {
+      chatContext = { topic: "roadmap", goal: "entrepreneurship" };
+      reply = "For entrepreneurship, identify one real customer problem, talk to 3–5 potential users, compare existing solutions, test a tiny version, and estimate costs before investing. What problem or business idea are you thinking about?";
+      pendingChatFollowUp = "business-idea";
+    }
+  } else if (pending === "target-role") {
+    if (normalized.length >= 2) {
+      reply = "For " + text.trim() + ", review 3–5 job descriptions and list repeated skills, practise the most important fundamentals, make one project that demonstrates them, and prepare a clear explanation of your contribution. Tell me your current skill level if you'd like a realistic weekly plan.";
+    }
+  } else if (pending === "skill-focus") {
+    if (normalized.length >= 2) {
+      reply = "Good choice. For " + text.trim() + ", start with the fundamentals, practise one small exercise each session, then build a mini-project that uses the skill. Keep notes on errors and explain your solution aloud. What is your current level: beginner, comfortable with basics, or intermediate?";
+      pendingChatFollowUp = "skill-level";
+    }
+  } else if (pending === "skill-level") {
+    if (/beginner|basic|start|new/.test(normalized)) {
+      reply = "Since you're starting out, spend the first few sessions on core concepts and tiny exercises before attempting a full project. Then build one feature at a time and test it. A manageable first milestone is a small working demo within a week.";
+    } else if (/intermediate|comfortable|know the basics|basics/.test(normalized)) {
+      reply = "Since you know the basics, avoid repeating beginner tutorials for too long. Build a small end-to-end project, look up concepts only when needed, test edge cases, and publish a README explaining your decisions.";
+    } else if (normalized.length >= 2) {
+      reply = "Start with a short diagnostic: try one beginner exercise without a tutorial. If you can explain and adapt it, move to a mini-project; otherwise revise the specific concept you got stuck on.";
+    }
+  } else if (pending === "internship-role") {
+    if (normalized.length >= 2) {
+      reply = "For a " + text.trim() + " internship, focus on the fundamentals named in the role, prepare one relevant project story, practise explaining a bug you solved, and tailor your resume to the requirements. Do you want technical questions or a mock interview first?";
+      pendingChatFollowUp = "interview-mode";
+    }
+  } else if (pending === "interview-mode") {
+    if (/mock|interview|practice|questions|technical/.test(normalized)) {
+      reply = /mock/.test(normalized) ? "Let's begin a mock interview. First question: introduce yourself in 45–60 seconds and connect your current skills or projects to the role. Reply with your answer and I'll give feedback." : "Start with these: (1) explain one project end-to-end, (2) describe a difficult bug and how you debugged it, (3) explain the core concepts required for the role, and (4) say what you would learn next. Practise answering each aloud in under two minutes.";
+    }
+  } else if (pending === "project-area") {
+    if (/web|frontend|html|css|javascript|website/.test(normalized)) {
+      reply = "Try a task tracker: add tasks, mark them complete, delete them, and save them in local storage. Build the interface first, then wire up each action and test empty input and refresh behaviour.";
+    } else if (/python|data|csv/.test(normalized)) {
+      reply = "Try a Python CSV report tool: load a CSV file, count rows and missing values, calculate simple summaries, and export a short report. Start with a small sample file and handle invalid or empty files.";
+    } else if (/sql|database|mysql/.test(normalized)) {
+      reply = "Try a student-course database with Students, Courses, and Enrollments tables. Add primary/foreign keys, sample rows, and queries using JOIN, GROUP BY, and constraints. Include a README with the schema and example outputs.";
+    } else if (/ai|machine learning|ml|sentiment/.test(normalized)) {
+      reply = "Try a small sentiment explorer: let a user enter text, classify it with a simple baseline or a clearly disclosed model, and show limitations with example cases. Focus on transparent behaviour and testing rather than claiming perfect accuracy.";
+    } else if (normalized.length >= 2) {
+      reply = "Choose a project small enough to finish in a few days. Define one user problem, implement one complete feature, test normal and edge cases, then write a README with screenshots and what you learned.";
+    }
+  } else if (pending === "career-interest") {
+    if (/build|code|technology|technical|program|software|web|ai|data/.test(normalized)) {
+      reply = "A practical experiment is to build a small project in the technical area you mentioned. Notice whether you enjoy solving bugs and improving it, then compare that feeling with a second activity such as analysing data or collaborating on a team task.";
+    } else if (/people|help|communicat|team|service/.test(normalized)) {
+      reply = "Try a role or project involving collaboration, support, teaching, coordination, or community impact. Afterward, reflect on whether you enjoyed explaining, organizing, and working with people—and compare that with one independent task.";
+    } else if (/business|sell|customer|entrepreneur|own/.test(normalized)) {
+      reply = "Try validating a small business problem: talk to a few potential customers, ask how they solve it today, and write down what they would value. Don't invest heavily until you have evidence that the problem matters.";
+    } else if (/research|theory|study|academic|exam/.test(normalized)) {
+      reply = "Try a short structured learning or research task: study one topic, summarize it in your own words, and solve a few related problems. This can help you judge whether you enjoy deeper study and exam-style preparation.";
+    } else if (normalized.length >= 2) {
+      reply = "Let's compare your interests with a small experiment: choose one activity you enjoy, one skill you're willing to practise, and one real-world task to try this week. Then judge the path by evidence, not pressure to decide immediately.";
+    }
+  } else if (pending === "study-field" || pending === "exam-target" || pending === "business-idea") {
+    if (normalized.length >= 2) {
+      reply = "Thanks—that gives us a starting point. Write down your next three actions, verify important requirements using official sources where relevant, and set a small milestone for this week. If you share your timeline and current level, I can help make the plan more specific.";
+    }
+  }
+
+  if (reply) {
+    if (!["roadmap-goal", "skill-focus", "internship-role", "project-area", "career-interest", "study-field", "exam-target", "business-idea", "target-role", "skill-level", "interview-mode"].includes(pendingChatFollowUp)) {
+      pendingChatFollowUp = null;
+    }
+    return reply;
+  }
+
+  return null;
+}
+
 function getChatReply(question) {
   const text = question.toLowerCase();
   const pathContext = selectedCategory
     ? " Since you last selected " + categoryNames[selectedCategory] + ", you can use that as your current focus—or explore another path if your interests have changed."
     : "";
 
+  const followUpReply = getFollowUpReply(question);
+  if (followUpReply) return followUpReply;
+
   if (/roadmap|plan my career|career plan|where do i start/.test(text)) {
-    return "Let's make a simple 7-day starter roadmap:\n1. Day 1: choose one goal and write why it matters.\n2. Days 2–3: learn one core skill for 30–45 minutes each day.\n3. Days 4–5: practise that skill with a tiny task or project.\n4. Day 6: ask someone for feedback.\n5. Day 7: review progress and choose the next small goal." + pathContext;
+    pendingChatFollowUp = "roadmap-goal";
+    chatContext.topic = "roadmap";
+    return "Let's make this useful for your situation. What do you want the roadmap to focus on: a job/internship, skills and projects, higher studies, government exams, or entrepreneurship?";
   }
   if (/interview|internship prep|prepare for an internship/.test(text)) {
-    return "Try this interview-prep checklist:\n1. Practise introducing yourself in 45–60 seconds.\n2. Revise fundamentals for the role.\n3. Be ready to explain one project: problem, your contribution, tools, challenge, and result.\n4. Practise a few questions aloud.\n5. Ask the recruiter thoughtful questions. Be honest when you don't know something.";
+    pendingChatFollowUp = "internship-role";
+    chatContext.topic = "internship";
+    return "Let's tailor your preparation. Which role are you preparing for—for example, frontend developer, full-stack developer, Python developer, data analyst, or another role?";
   }
   if (/project idea|project ideas|practical project|build a project/.test(text)) {
-    return "Pick a small project you can finish and demonstrate:\n• Web development: a task tracker with add, complete, and delete actions.\n• Python: a CSV data summary tool.\n• SQL: a student/course database with joins and constraints.\n• AI/data: a small text sentiment explorer with clear limitations.\nStart with one working feature, test it, and write a README explaining your own work.";
+    pendingChatFollowUp = "project-area";
+    chatContext.topic = "project";
+    return "Sure! Which area interests you most: web development, Python/data, SQL/database, or AI/ML? I'll suggest a project with a practical first milestone.";
   }
   if (/choose between|help me choose|career path|which career|confused|don't know|dont know/.test(text)) {
-    return "You don't have to decide your whole future today. Compare options using four questions: What tasks interest me? What skills am I willing to practise? What constraints matter (time, cost, location)? What small experiment can I try this week? Explore one path at a time and review what you learn." + pathContext;
+    pendingChatFollowUp = "career-interest";
+    chatContext.topic = "career-choice";
+    return "Let's narrow it down together. Which activities do you enjoy most: building or coding, analysing information, working with people, research/study, or business and selling? You can name more than one.";
   }
   if (/free resource|free course|learn for free|resources/.test(text)) {
     return "For free learning, start with official documentation and structured beginner material: MDN Web Docs for web development, the Python Tutorial at docs.python.org for Python, and SQLBolt for interactive SQL practice. Prefer one resource at a time, practise as you learn, and verify course or exam details on official sites.";
   }
-  if (/internship|intern\b|experience/.test(text)) return "Start by choosing one role or skill area. Build a small related project, prepare a one-page resume, and apply through company career pages and trusted internship platforms. Check each opportunity carefully before sharing personal information.";
+  if (/internship|intern\b|experience/.test(text)) {
+    pendingChatFollowUp = "internship-role";
+    chatContext.topic = "internship";
+    return "I can help with that. Which role are you targeting—frontend, full-stack, Python, data analysis, or something else?";
+  }
   if (/resume|cv|portfolio|github/.test(text)) return "Keep your resume concise and truthful. Pin 2–3 projects, add a clear README to each repository, explain your own contribution, and include working demos when possible. Never list skills you cannot discuss in an interview.";
-  if (/skill|learn|programming|coding|developer/.test(text)) return "Choose one target role and learn its core skills in small steps. Practise fundamentals, build a tiny project, explain your code aloud, and repeat. Consistent practice is usually more useful than collecting many unfinished courses.";
-  if (/higher stud|master|m.?s.?|m.?tech|college|university|research/.test(text)) return "Compare programs by curriculum, eligibility, cost, faculty or research fit, and career outcomes. Verify requirements and deadlines on official institution websites before making decisions.";
-  if (/government|govt|exam|civil service|banking|railway/.test(text)) return "First compare eligibility, syllabus, exam stages, and the time you can prepare. Use official recruitment notifications for dates and rules, then build a steady plan with revision and practice tests.";
-  if (/business|entrepreneur|startup|customer|idea/.test(text)) return "Start with the problem, not just the product idea. Talk to potential users, check how they solve it today, test a small version, and estimate costs before making a large investment.";
+  if (/skill|learn|programming|coding|developer/.test(text)) {
+    pendingChatFollowUp = "skill-focus";
+    chatContext.topic = "skills";
+    return "Let's make a practical learning plan. Which skill do you want to focus on first—web development, Python, SQL, communication, or something else?";
+  }
+  if (/higher stud|master|m.?s.?|m.?tech|college|university|research/.test(text)) {
+    pendingChatFollowUp = "study-field";
+    chatContext.topic = "higher-studies";
+    return "What subject or specialization are you considering? I can help you outline what to compare and how to start preparing.";
+  }
+  if (/government|govt|exam|civil service|banking|railway/.test(text)) {
+    pendingChatFollowUp = "exam-target";
+    chatContext.topic = "government-exams";
+    return "Which government exam or job category are you considering? If you're unsure, tell me your qualification and the type of work you prefer.";
+  }
+  if (/business|entrepreneur|startup|customer|idea/.test(text)) {
+    pendingChatFollowUp = "business-idea";
+    chatContext.topic = "entrepreneurship";
+    return "Do you already have a business idea, or would you like help finding a problem worth solving?";
+  }
   if (/hello|hi\b|hey/.test(text)) return "Hey! 👋 Tell me what you're exploring—jobs, college skills, government exams, higher studies, or a business idea—and I'll share a practical starting point.";
   return "I can help with career roadmaps, interview preparation, project ideas, resumes and GitHub, learning skills, higher studies, government exams, and entrepreneurship. Ask me about one specific goal and I'll suggest a practical next step." + pathContext;
 }
