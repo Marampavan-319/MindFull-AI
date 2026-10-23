@@ -141,6 +141,60 @@
     </section>
     </div>
 
+
+    <section class="assessment-screen" id="assessment-screen" hidden>
+      <button class="back-link assessment-back" type="button" id="back-to-paths">← Back to career paths</button>
+      <div class="assessment-shell">
+        <div class="assessment-heading">
+          <span class="eyebrow">YOUR NEXT STEP</span>
+          <h1 id="assessment-title">Let's understand what matters to you.</h1>
+          <p id="assessment-intro">Answer honestly. There are no right or wrong answers, and your responses are used only to suggest possible next steps.</p>
+        </div>
+        <div class="assessment-progress" aria-live="polite">
+          <span id="question-progress">Question 1 of 5</span>
+          <div class="progress-track"><span id="progress-fill"></span></div>
+        </div>
+        <form id="assessment-form">
+          <div id="question-container"></div>
+          <div class="assessment-actions">
+            <button class="secondary-button" type="button" id="previous-question" disabled>← Previous</button>
+            <button class="primary-button" type="button" id="next-question">Next question →</button>
+            <button class="primary-button" type="submit" id="show-results" hidden>See my guidance ✨</button>
+          </div>
+          <p class="form-hint" id="form-hint" aria-live="polite">Choose one answer to continue.</p>
+        </form>
+        <section class="results-panel" id="results-panel" hidden aria-live="polite">
+          <span class="results-sparkle" aria-hidden="true">✦</span>
+          <span class="eyebrow">YOUR STARTING POINT</span>
+          <h2 id="result-title">Your possible next steps</h2>
+          <p id="result-summary"></p>
+          <div id="recommendation-list" class="recommendation-list"></div>
+          <p class="results-disclaimer">These suggestions are based on your answers, not a scientific or definitive assessment. Use them as a starting point and adjust them to your circumstances.</p>
+          <div class="results-actions">
+            <button class="primary-button" type="button" id="retake-assessment">Retake assessment</button>
+            <button class="secondary-button" type="button" id="change-path">Explore another path</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="career-chat" id="career-chat" aria-label="Career guidance chatbot">
+      <button class="chat-toggle" type="button" id="chat-toggle" aria-expanded="false" aria-controls="chat-panel">
+        <span aria-hidden="true">✦</span> Ask Career Guide
+      </button>
+      <div class="chat-panel" id="chat-panel" hidden>
+        <div class="chat-header"><div><strong>Career Guide</strong><p>Quick answers for your next step</p></div><button type="button" id="close-chat" aria-label="Close chat">×</button></div>
+        <div class="chat-messages" id="chat-messages" aria-live="polite">
+          <div class="chat-bubble bot-bubble">Hi! Ask me about career paths, skills, internships, exams, or higher studies. I use simple built-in guidance, so I may not know every detail.</div>
+        </div>
+        <form id="chat-form" class="chat-form">
+          <label class="visually-hidden" for="chat-input">Ask a career question</label>
+          <input id="chat-input" type="text" placeholder="e.g. How do I find an internship?" maxlength="240" required>
+          <button type="submit" aria-label="Send message">➤</button>
+        </form>
+      </div>
+    </section>
+
     <section class="partnership-screen" id="partnership-screen" hidden>
       <a class="back-link" href="#" data-view="home">← Back to choices</a>
       <div class="partnership-panel">
