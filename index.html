@@ -66,6 +66,7 @@
       <button class="nav-link nav-button active" type="button" data-view="home">Home</button>
       <button class="nav-link nav-button" type="button" data-view="guidance">Guidance</button>
       <button class="nav-link nav-button" type="button" data-view="partnership">Partnership</button>
+      <button class="nav-link nav-button" type="button" data-view="history">History</button>
     </nav>
     <span class="header-note"><span class="status-dot"></span><span id="signed-in-label">Your next step starts here</span></span>
     <button class="nav-link nav-button auth-logout" id="signout-button" type="button" hidden>Sign out</button>
@@ -290,6 +291,24 @@
         <div class="saved-bookings-list" id="saved-bookings-list"></div>
         <button class="text-button" id="clear-bookings" type="button">Clear saved demo requests</button>
       </section>
+    </section>
+
+    <section class="history-screen" id="history-screen" hidden>
+      <div class="history-heading">
+        <span class="eyebrow">YOUR ACTIVITY</span>
+        <h1>Your history, all in one place.</h1>
+        <p>Review mentor requests and their demo payment status. This history is saved in this browser on this device; it is not a real payment or confirmed appointment record.</p>
+      </div>
+      <div class="history-toolbar">
+        <div><strong id="history-count">0 requests</strong><p>Paid, pending, and expired demo requests</p></div>
+        <button class="secondary-button" id="history-refresh" type="button">Refresh history</button>
+      </div>
+      <div class="history-list" id="history-list" aria-live="polite"></div>
+      <p class="history-empty" id="history-empty" hidden>You don't have any mentor requests yet. Once you submit a demo booking request, it will appear here—even if you don't complete payment.</p>
+      <div class="history-actions">
+        <button class="primary-button" id="history-find-mentor" type="button">Find a mentor</button>
+        <button class="text-button" id="history-clear" type="button">Clear all history on this device</button>
+      </div>
     </section>
 
     <section class="career-chat" id="career-chat" aria-label="Career guidance chatbot">
