@@ -1,6 +1,6 @@
 "use strict";
 
-// MindFull Carrier — Part 1 interactions
+// MindFull Carrier — Part 1 interactions and top-level navigation
 const careerCards = document.querySelectorAll(".career-card");
 const continueButton = document.querySelector("#continue-button");
 const selectionTitle = document.querySelector("#selection-title");
@@ -56,3 +56,34 @@ continueButton.addEventListener("click", () => {
 });
 
 console.log("MindFull Carrier Part 1 loaded successfully.");
+
+
+// Top-level navigation: Home -> Guidance categories or Partnership placeholder.
+const homeScreen = document.querySelector("#home-screen");
+const guidanceContent = document.querySelector("#guidance-content");
+const partnershipScreen = document.querySelector("#partnership-screen");
+const viewButtons = document.querySelectorAll("[data-view]");
+const navButtons = document.querySelectorAll(".header-nav [data-view]");
+
+function showView(view) {
+  homeScreen.hidden = view !== "home";
+  guidanceContent.hidden = view !== "guidance";
+  partnershipScreen.hidden = view !== "partnership";
+
+  navButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.view === view);
+  });
+
+  if (view === "guidance") {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } else {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}
+
+viewButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    showView(button.dataset.view);
+  });
+});
