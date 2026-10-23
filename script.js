@@ -230,15 +230,188 @@ assessmentForm.addEventListener("submit", (event) => {
   showResults();
 });
 
+const answerGuidance = {
+  employment: [
+    [
+      ["Create a hands-on work sample", "Build a small project related to a role you want and document what you did."],
+      ["Compare role stability and growth", "Review role responsibilities, entry requirements, and progression before choosing a target."],
+      ["Practise teamwork examples", "Prepare examples of solving a problem with others and explaining your contribution."],
+      ["Explore before specializing", "Compare two or three entry-level roles and note which tasks interest you most."]
+    ],
+    [
+      ["Build a technical mini-project", "Choose a beginner-friendly project that demonstrates building or fixing something."],
+      ["Practise data analysis", "Try a small dataset and explain the patterns or conclusions you discover."],
+      ["Strengthen communication", "Practise explaining a concept clearly and collect examples of teamwork or helping others."],
+      ["Create a creative portfolio piece", "Make one design, presentation, or product idea that shows your thinking."]
+    ],
+    [
+      ["Learn by building", "Use a short tutorial, then build a small variation without copying every step."],
+      ["Follow a structured course", "Choose one course with clear milestones and complete a small exercise after each topic."],
+      ["Find feedback", "Ask a mentor, teacher, or peer to review your work and suggest one improvement."],
+      ["Practise through experiments", "Try small tasks, note what failed, and record what you learned."]
+    ],
+    [
+      ["Apply to a focused shortlist", "Prepare a truthful one-page resume and apply to suitable internships or entry-level roles."],
+      ["Close one skill gap", "Compare target job descriptions and practise the most common missing skill."],
+      ["Practise interview stories", "Prepare concise examples about a project, a challenge, and what you learned."],
+      ["Explore role fit", "Read a few job descriptions and speak to someone in a role that interests you."]
+    ],
+    [
+      ["Use a light weekly plan", "Set two short sessions each week and make the goal small enough to finish."],
+      ["Schedule steady practice", "Plan 5–10 focused hours across the week and track completed tasks."],
+      ["Create a deeper work block", "Use several focused sessions for learning, building, and review without skipping rest."],
+      ["Set a measurable weekly target", "Choose a project milestone or number of applications that fits your actual schedule."]
+    ]
+  ],
+  "higher-studies": [
+    [
+      ["Explore subject depth", "Compare advanced modules, faculty interests, and research areas in programs you like."],
+      ["Connect study to career goals", "Check which qualifications are required for the careers you are considering."],
+      ["Explore research opportunities", "Read recent papers or lab pages and note questions you would like to investigate."],
+      ["Compare international options carefully", "Review recognition, total cost, language requirements, and visa rules through official sources."]
+    ],
+    [
+      ["Strengthen theory foundations", "List prerequisite topics and create a revision plan before advanced coursework."],
+      ["Compare lab and project facilities", "Review practical modules, capstone projects, and available facilities."],
+      ["Look for research mentorship", "Identify faculty or research groups whose work matches your interests."],
+      ["Balance theory and practice", "Compare programs using both course content and hands-on opportunities."]
+    ],
+    [
+      ["Research your specialization", "Compare entry requirements and course modules for your chosen subject."],
+      ["Narrow your shortlist", "Compare two or three subject areas by interest, prerequisites, and career options."],
+      ["Explore before committing", "Take an introductory course and read program outlines before selecting a field."],
+      ["Compare career outcomes", "Look at alumni outcomes and the skills employers or research programs expect."]
+    ],
+    [
+      ["Build a program comparison", "Compare curriculum, eligibility, cost, location, and outcomes in one table."],
+      ["Create an entrance-exam plan", "Verify the official syllabus and dates, then schedule topic practice and mock tests."],
+      ["Contact research groups", "Read faculty pages and prepare a concise, thoughtful inquiry about research fit."],
+      ["Investigate funding early", "Check scholarships, assistantships, fee waivers, and deadlines on official sites."]
+    ],
+    [
+      ["Prepare for the next intake", "Make a document checklist and work backward from verified application deadlines."],
+      ["Use the next year strategically", "Build prerequisites, prepare exams if needed, and gather application materials."],
+      ["Plan a longer runway", "Use the time to improve foundations, explore research, and compare programs carefully."],
+      ["Run a low-risk exploration", "Compare costs and career alternatives before deciding whether further study is right for you."]
+    ]
+  ],
+  "government-jobs": [
+    [
+      ["Connect preparation to public service", "Research roles and departments whose responsibilities match the impact you want to make."],
+      ["Compare stable career pathways", "Compare exam stages, posting patterns, eligibility, and career progression before selecting a target."],
+      ["Explore technical recruitment", "Look for official technical or engineering recruitment notices that match your degree."],
+      ["Compare specific departments", "Choose a few departments and verify their current eligibility and recruitment routes."]
+    ],
+    [
+      ["Start with a short daily routine", "Build consistency with a manageable study block and one small revision target."],
+      ["Use a structured daily timetable", "Divide study time between new topics, revision, and practice questions."],
+      ["Plan intensive preparation sustainably", "Set weekly targets and include mock tests and rest to avoid burnout."],
+      ["Test a realistic schedule", "Try a one-week routine and adjust it to your actual college, work, and family commitments."]
+    ],
+    [
+      ["Explore civil-service requirements", "Read the official exam syllabus, stages, eligibility, and recent notifications."],
+      ["Compare major exam options", "Compare syllabus overlap, stages, and eligibility for the exams you are considering."],
+      ["Search for technical posts", "Check official public-sector and recruitment sites for posts aligned with your qualification."],
+      ["Check state-level opportunities", "Verify current state recruitment notifications, language requirements, and eligibility."]
+    ],
+    [
+      ["Verify your eligibility", "Check age, qualification, category rules where applicable, and dates in the official notification."],
+      ["Confirm uncertain details", "Write down your eligibility questions and verify each one using the official notice."],
+      ["Start with the official notification", "Read the eligibility section and syllabus before buying materials or planning preparation."],
+      ["Compare before committing", "Create a side-by-side comparison of exam eligibility, syllabus, and stages."]
+    ],
+    [
+      ["Compare syllabi", "Pick a target exam and map its official syllabus into weekly topics."],
+      ["Build a study timetable", "Schedule new topics, revision, and a regular review of weak areas."],
+      ["Practise with mock tests", "Use syllabus-aligned questions and review why each mistake happened."],
+      ["Choose one primary target", "Compare your eligibility and interests, then choose one main exam to prepare for first."]
+    ]
+  ],
+  "college-career": [
+    [
+      ["Prepare for internships", "Pick a target role, practise common fundamentals, and apply with a truthful resume."],
+      ["Build a portfolio project", "Choose a project small enough to finish and explain clearly in a demonstration."],
+      ["Strengthen academic foundations", "Identify two difficult subjects and schedule short revision and practice sessions."],
+      ["Explore career options", "Try a mini-project or introductory lesson in two fields and compare your interest."]
+    ],
+    [
+      ["Practise problem-solving", "Solve small coding problems regularly and explain the approach before writing code."],
+      ["Practise communication", "Explain one project aloud each week and ask a friend for feedback."],
+      ["Build a web or app project", "Create a simple working feature, test it, and document how it works."],
+      ["Try a data or AI mini-project", "Start with a small dataset or beginner model and explain its limitations."]
+    ],
+    [
+      ["Start with a tiny project", "Build one useful feature first instead of trying to create a large application at once."],
+      ["Turn your idea into a plan", "Write the problem, intended user, core feature, and first three implementation tasks."],
+      ["Improve an existing project", "Fix a bug, improve usability, and document what changed."],
+      ["Publish and explain your work", "Add a README, screenshots or demo instructions, and a clear description of your contribution."]
+    ],
+    [
+      ["Use a small weekly routine", "Schedule a few short sessions and finish one achievable milestone."],
+      ["Plan four to six hours", "Split time between learning, implementation, and reviewing what you built."],
+      ["Reserve project blocks", "Set aside focused time for building and a separate session for debugging and notes."],
+      ["Set a stretch goal", "Choose one measurable weekly deliverable while protecting college and rest time."]
+    ],
+    [
+      ["Create a simple roadmap", "Choose one goal and break it into weekly tasks with a clear finish line."],
+      ["Finish a demonstrable project", "Prioritize a working project over starting several projects at once."],
+      ["Polish your profile", "Improve your resume, GitHub README files, and short project explanations."],
+      ["Build a sustainable routine", "Use a repeatable weekly plan and review progress every weekend."]
+    ]
+  ],
+  entrepreneurship: [
+    [
+      ["Start with a real customer problem", "Interview a few people about a problem they already face before choosing a solution."],
+      ["Shape your idea into a small offer", "Describe who it helps, what it does, and why someone might choose it over alternatives."],
+      ["Test a simple income idea", "Explore a low-cost service or product and check whether people would realistically pay for it."],
+      ["Explore a technical prototype", "Define the one core feature that would let someone experience your product idea."]
+    ],
+    [
+      ["Validate the problem first", "Ask potential users how they currently handle the problem and what frustrates them."],
+      ["Compare ideas with evidence", "List your ideas, the users they serve, and the easiest low-cost test for each."],
+      ["Find problems worth solving", "Observe repeated inconveniences in a community or industry and ask people about their current workarounds."],
+      ["Research before investing", "Study existing solutions, likely users, and the smallest way to test demand without a large spend."]
+    ],
+    [
+      ["Build a basic prototype", "Use your current skills to create a clickable mock-up or minimum working version of the main feature."],
+      ["Talk to potential customers", "Practise asking open questions and listen for repeated needs instead of pitching immediately."],
+      ["Test a simple sales channel", "Try a small, low-cost way to reach potential customers and record what gets a response."],
+      ["Start with research and a budget", "Estimate basic costs and validate demand before committing money or buying tools."]
+    ],
+    [
+      ["Test whether demand exists", "Talk to potential users and offer a simple mock-up or description to learn whether the problem matters."],
+      ["Reduce technical risk", "Build the smallest prototype that tests the hardest technical assumption."],
+      ["Find your first customers", "Describe your ideal customer and test one suitable outreach or marketing channel."],
+      ["Work out the numbers", "Estimate costs, a realistic price, and how many sales you would need to cover expenses."]
+    ],
+    [
+      ["Run customer conversations", "Speak with a few target users and summarize the problems that appear repeatedly."],
+      ["Build a minimum viable prototype", "Create only the core feature needed to test whether the idea solves the problem."],
+      ["Research alternatives", "Compare existing products, prices, customer complaints, and gaps you may be able to serve."],
+      ["Run a small pilot", "Test with a few real users, collect feedback, and track whether they would use or pay for it again."]
+    ]
+  ]
+};
+
+function getPersonalizedRecommendations() {
+  const guidance = answerGuidance[selectedCategory];
+  // Use answers to questions 2, 4, and 5 so the result reflects the user's choices.
+  const selectedQuestionIndexes = [1, 3, 4];
+  return selectedQuestionIndexes.map((questionIndex) => {
+    const answerIndex = answers[questionIndex];
+    return guidance[questionIndex][answerIndex];
+  });
+}
+
 function showResults() {
-  const recommendations = recommendationSets[selectedCategory];
   const answerCount = Object.keys(answers).length;
   if (answerCount < questionSets[selectedCategory].length) {
     showToast("Please answer all five questions first.");
     return;
   }
+  const recommendations = getPersonalizedRecommendations();
   resultTitle.textContent = "Your " + categoryNames[selectedCategory] + " starting plan";
-  resultSummary.textContent = "You've completed the reflection questions. Based on the path you chose, here are practical steps you can try next. Treat these as options to explore, not a final verdict about your future.";
+  resultSummary.textContent = "These next steps are tailored to your answers about your current situation and priorities. Change your answers to explore a different plan.";
   recommendationList.replaceChildren();
   recommendations.forEach(([title, description], index) => {
     const item = document.createElement("article");
