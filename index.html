@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore career possibilities with personalized guidance from MindFull Carrier.">
+  <title>MindFull Carrier | Find Your Direction</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="MindFull Carrier home">
+      <span class="brand-mark">M</span>
+      <span>MindFull <span class="brand-accent">Carrier</span></span>
+    </a>
+    <nav class="header-nav" aria-label="Main navigation">
+      <a class="nav-link active" href="#guidance">Guidance</a>
+      <a class="nav-link" href="#how-it-works">How it works</a>
+    </nav>
+    <span class="header-note"><span class="status-dot"></span>Your next step starts here</span>
+  </header>
+
+  <main>
+    <section class="hero" id="guidance">
+      <div class="hero-content">
+        <span class="eyebrow">✦ YOUR FUTURE, YOUR WAY</span>
+        <h1>Your future doesn't have to be a <span>guess.</span></h1>
+        <p class="hero-description">Big dreams, confusing choices, or no idea where to begin? Let's explore your possibilities together, one step at a time.</p>
+        <a class="primary-button hero-button" href="#career-paths">Explore my options <span aria-hidden="true">→</span></a>
+        <div class="trust-note"><span class="trust-icon" aria-hidden="true">♡</span>No judgment. Just guidance to help you move forward.</div>
+      </div>
+      <aside class="hero-card" aria-label="Your journey">
+        <div class="hero-illustration" aria-hidden="true">
+          <span class="illustration-star star-one">✦</span>
+          <span class="illustration-star star-two">✧</span>
+          <div class="sun"></div>
+          <div class="mountain mountain-back"></div>
+          <div class="mountain mountain-front"></div>
+          <div class="path"></div>
+          <div class="destination">✦</div>
+        </div>
+        <div class="hero-card-caption">
+          <span class="caption-icon">↗</span>
+          <div><strong>Your journey, at your pace</strong><p>Discover what feels right for you.</p></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="guidance-section" id="career-paths">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">LET'S FIND YOUR DIRECTION</span>
+          <h2>What are you thinking about?</h2>
+          <p>Choose the path you'd like to explore. You don't need to have everything figured out.</p>
+        </div>
+        <span class="step-label"><span>01</span> / CHOOSE A PATH</span>
+      </div>
+
+      <div class="career-grid">
+        <button class="career-card" type="button" data-category="employment" aria-pressed="false">
+          <span class="card-top"><span class="card-icon employment-icon" aria-hidden="true">↗</span><span class="card-arrow" aria-hidden="true">↗</span></span>
+          <span class="card-title">Employment</span>
+          <span class="card-description">Explore job roles, workplace preferences, and skills employers look for.</span>
+          <span class="card-tag">Jobs &amp; careers</span>
+        </button>
+        <button class="career-card" type="button" data-category="higher-studies" aria-pressed="false">
+          <span class="card-top"><span class="card-icon studies-icon" aria-hidden="true">⌘</span><span class="card-arrow" aria-hidden="true">↗</span></span>
+          <span class="card-title">Higher Studies</span>
+          <span class="card-description">Consider postgraduate courses, specializations, and further learning.</span>
+          <span class="card-tag">Education &amp; research</span>
+        </button>
+        <button class="career-card" type="button" data-category="government-jobs" aria-pressed="false">
+          <span class="card-top"><span class="card-icon government-icon" aria-hidden="true">▤</span><span class="card-arrow" aria-hidden="true">↗</span></span>
+          <span class="card-title">Government Jobs</span>
+          <span class="card-description">Explore public-sector roles, eligibility, and competitive exam paths.</span>
+          <span class="card-tag">Public service</span>
+        </button>
+        <button class="career-card" type="button" data-category="college-career" aria-pressed="false">
+          <span class="card-top"><span class="card-icon college-icon" aria-hidden="true">⌂</span><span class="card-arrow" aria-hidden="true">↗</span></span>
+          <span class="card-title">College Career</span>
+          <span class="card-description">Plan projects, internships, skills, and your next steps as a student.</span>
+          <span class="card-tag">Student growth</span>
+        </button>
+        <button class="career-card entrepreneurship-card" type="button" data-category="entrepreneurship" aria-pressed="false">
+          <span class="card-top"><span class="card-icon business-icon" aria-hidden="true">✳</span><span class="card-arrow" aria-hidden="true">↗</span></span>
+          <span class="card-title">Entrepreneurship</span>
+          <span class="card-description">Explore business ideas, problem-solving, and turning ideas into action.</span>
+          <span class="card-tag">Ideas &amp; business</span>
+        </button>
+      </div>
+
+      <div class="selection-panel" id="selection-panel" aria-live="polite">
+        <div class="selection-copy">
+          <span class="selection-check" aria-hidden="true">✓</span>
+          <div><strong id="selection-title">Your journey starts with a choice.</strong><p id="selection-message">Choose a path above to take your first step.</p></div>
+        </div>
+        <button class="primary-button continue-button" id="continue-button" type="button" disabled>Continue <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <section class="how-section" id="how-it-works">
+      <div class="section-heading">
+        <div><span class="eyebrow">A LITTLE CLARITY GOES A LONG WAY</span><h2>Your journey, made simpler.</h2><p>No pressure to know all the answers. Start where you are.</p></div>
+      </div>
+      <div class="steps-grid">
+        <article class="step-card"><span class="step-number">01</span><h3>Tell us about you</h3><p>Share your interests, goals, preferences, and what matters to you.</p></article>
+        <article class="step-card"><span class="step-number">02</span><h3>Explore possibilities</h3><p>Review possible directions and understand why they may be worth exploring.</p></article>
+        <article class="step-card"><span class="step-number">03</span><h3>Plan your next move</h3><p>Find practical next steps, useful skills, and options for further support.</p></article>
+      </div>
+    </section>
+
+    <section class="bottom-note">
+      <span class="bottom-note-icon" aria-hidden="true">✦</span>
+      <div><h2>You don't need a perfect plan to get started.</h2><p>Every meaningful journey begins with one small, thoughtful step.</p></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand footer-brand" href="#guidance"><span class="brand-mark">M</span><span>MindFull <span class="brand-accent">Carrier</span></span></a>
+    <p>Explore your possibilities. Make your next step count.</p>
+    <span>© <span id="current-year"></span> MindFull Carrier</span>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
