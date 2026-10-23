@@ -395,11 +395,14 @@ const answerGuidance = {
 
 function getPersonalizedRecommendations() {
   const guidance = answerGuidance[selectedCategory];
-  // Use answers to questions 2, 4, and 5 so the result reflects the user's choices.
-  const selectedQuestionIndexes = [1, 3, 4];
-  return selectedQuestionIndexes.map((questionIndex) => {
+  // Every answer contributes one matching next step to the user's plan.
+  return questionSets[selectedCategory].map((question, questionIndex) => {
     const answerIndex = answers[questionIndex];
-    return guidance[questionIndex][answerIndex];
+    const optionsForQuestion = guidance[questionIndex];
+    if (answerIndex === undefined || !optionsForQuestion || !optionsForQuestion[answerIndex]) {
+      return ["Review this priority", "Revisit this question and choose the option that best matches your current situation."];
+    }
+    return optionsForQuestion[answerIndex];
   });
 }
 
