@@ -916,3 +916,163 @@ removeExpiredUnpaidBookings();
 // Keep expiry enforcement active even if the user closes the confirmation panel or starts another request.
 window.setInterval(removeExpiredUnpaidBookings, 1000);
 console.log("MindFull Carrier Step 3 loaded successfully.");
+
+
+/* Authentication MVP: browser-local demo accounts only, not production security. */
+const authScreen = document.querySelector("#auth-screen");
+const signinTab = document.querySelector("#signin-tab");
+const signupTab = document.querySelector("#signup-tab");
+const signinForm = document.querySelector("#signin-form");
+const signupForm = document.querySelector("#signup-form");
+const authTitle = document.querySelector("#auth-title");
+const authSubtitle = document.querySelector("#auth-subtitle");
+const signinFeedback = document.querySelector("#signin-feedback");
+const signupFeedback = document.querySelector("#signup-feedback");
+const demoAccountButton = document.querySelector("#demo-account-button");
+const signoutButton = document.querySelector("#signout-button");
+const signedInLabel = document.querySelector("#signed-in-label");
+const authAccountsKey = "mindfullCarrier.prototypeAccounts";
+const authSessionKey = "mindfullCarrier.prototypeSession";
+
+function readAuthAccounts() {
+  try {
+    const value = JSON.parse(localStorage.getItem(authAccountsKey) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+async function hashAuthPassword(password) {
+  if (!window.crypto || !window.crypto.subtle || !window.TextEncoder) {
+    throw new Error("Password hashing is unavailable here. Open the deployed HTTPS site or a modern local server.");
+  }
+  const bytes = new TextEncoder().encode(password);
+  const digest = await window.crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function setAuthFeedback(element, message, success = false) {
+  element.textContent = message;
+  element.classList.toggle("success", success);
+}
+
+function showAuthMode(mode) {
+  const signup = mode === "signup";
+  signinForm.hidden = signup;
+  signupForm.hidden = !signup;
+  signinTab.classList.toggle("active", !signup);
+  signupTab.classList.toggle("active", signup);
+  signinTab.setAttribute("aria-selected", String(!signup));
+  signupTab.setAttribute("aria-selected", String(signup));
+  authTitle.textContent = signup ? "Create your account" : "Welcome back";
+  authSubtitle.textContent = signup ? "Start your career journey with MindFull Carrier." : "Sign in to pick up where you left off.";
+  setAuthFeedback(signinFeedback, "");
+  setAuthFeedback(signupFeedback, "");
+}
+
+function enterApplication(user, isDemo = false) {
+  const session = {
+    name: user.name || "Demo User",
+    email: user.email || "demo@mindfullcarrier.local",
+    demo: Boolean(isDemo),
+    signedInAt: Date.now()
+  };
+  try {
+    localStorage.setItem(authSessionKey, JSON.stringify(session));
+  } catch (error) {
+    // Keep the current visit usable if storage is disabled.
+  }
+  authScreen.hidden = true;
+  signoutButton.hidden = false;
+  signedInLabel.textContent = "Hi, " + session.name.split(" ")[0];
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  showToast(isDemo ? "Welcome! You're exploring with the demo account." : "Welcome back, " + session.name.split(" ")[0] + "!");
+}
+
+function restoreAuthSession() {
+  try {
+    const session = JSON.parse(localStorage.getItem(authSessionKey) || "null");
+    if (session && session.name) {
+      authScreen.hidden = true;
+      signoutButton.hidden = false;
+      signedInLabel.textContent = "Hi, " + session.name.split(" ")[0];
+    } else {
+      authScreen.hidden = false;
+      signoutButton.hidden = true;
+    }
+  } catch (error) {
+    authScreen.hidden = false;
+    signoutButton.hidden = true;
+  }
+}
+
+signinTab.addEventListener("click", () => showAuthMode("signin"));
+signupTab.addEventListener("click", () => showAuthMode("signup"));
+
+signupForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  setAuthFeedback(signupFeedback, "");
+  const name = document.querySelector("#signup-name").value.trim();
+  const email = document.querySelector("#signup-email").value.trim().toLowerCase();
+  const password = document.querySelector("#signup-password").value;
+  const confirmPassword = document.querySelector("#signup-confirm-password").value;
+  if (name.length < 2) {
+    setAuthFeedback(signupFeedback, "Please enter your name.");
+    return;
+  }
+  if (password !== confirmPassword) {
+    setAuthFeedback(signupFeedback, "The passwords do not match.");
+    return;
+  }
+  const accounts = readAuthAccounts();
+  if (accounts.some((account) => account.email === email)) {
+    setAuthFeedback(signupFeedback, "An account with this email already exists. Please sign in instead.");
+    return;
+  }
+  try {
+    const passwordHash = await hashAuthPassword(password);
+    accounts.push({ name, email, passwordHash, createdAt: Date.now() });
+    localStorage.setItem(authAccountsKey, JSON.stringify(accounts));
+    enterApplication({ name, email });
+  } catch (error) {
+    setAuthFeedback(signupFeedback, error.message || "We couldn't create the account in this browser.");
+  }
+});
+
+signinForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  setAuthFeedback(signinFeedback, "");
+  const email = document.querySelector("#signin-email").value.trim().toLowerCase();
+  const password = document.querySelector("#signin-password").value;
+  const account = readAuthAccounts().find((item) => item.email === email);
+  if (!account) {
+    setAuthFeedback(signinFeedback, "No local account found for this email. Create an account or use the demo account.");
+    return;
+  }
+  try {
+    const passwordHash = await hashAuthPassword(password);
+    if (passwordHash !== account.passwordHash) {
+      setAuthFeedback(signinFeedback, "That password doesn't match this local account. Please try again.");
+      return;
+    }
+    enterApplication(account);
+  } catch (error) {
+    setAuthFeedback(signinFeedback, error.message || "We couldn't sign you in in this browser.");
+  }
+});
+
+demoAccountButton.addEventListener("click", () => {
+  enterApplication({ name: "Demo User", email: "demo@mindfullcarrier.local" }, true);
+});
+
+signoutButton.addEventListener("click", () => {
+  try { localStorage.removeItem(authSessionKey); } catch (error) { /* Sign-out still hides the app locally. */ }
+  authScreen.hidden = false;
+  signoutButton.hidden = true;
+  showAuthMode("signin");
+  document.querySelector("#signin-password").value = "";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+restoreAuthSession();
