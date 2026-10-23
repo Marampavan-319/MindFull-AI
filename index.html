@@ -9,6 +9,54 @@
   <script src="script.js" defer></script>
 </head>
 <body>
+  <section class="auth-screen" id="auth-screen" aria-labelledby="auth-title">
+    <div class="auth-decoration auth-decoration-one" aria-hidden="true"></div>
+    <div class="auth-decoration auth-decoration-two" aria-hidden="true"></div>
+    <div class="auth-layout">
+      <div class="auth-intro">
+        <a class="brand auth-brand" href="#" aria-label="MindFull Carrier">
+          <span class="brand-mark">M</span><span>MindFull <span class="brand-accent">Carrier</span></span>
+        </a>
+        <span class="eyebrow">✦ YOUR FUTURE, YOUR WAY</span>
+        <h1>Small steps today.<br><span>More possibilities tomorrow.</span></h1>
+        <p>Sign in to continue exploring career paths, personalized guidance, and mentor sessions.</p>
+        <div class="auth-benefits">
+          <p><span aria-hidden="true">✓</span> Discover career directions that fit your interests</p>
+          <p><span aria-hidden="true">✓</span> Get practical next steps and learning ideas</p>
+          <p><span aria-hidden="true">✓</span> Keep your demo session history on this device</p>
+        </div>
+      </div>
+      <div class="auth-card">
+        <div class="auth-card-heading">
+          <span class="auth-mini-mark" aria-hidden="true">✦</span>
+          <h2 id="auth-title">Welcome back</h2>
+          <p id="auth-subtitle">Sign in to pick up where you left off.</p>
+        </div>
+        <div class="auth-tabs" role="tablist" aria-label="Account access">
+          <button class="auth-tab active" id="signin-tab" type="button" role="tab" aria-selected="true" aria-controls="signin-form">Sign in</button>
+          <button class="auth-tab" id="signup-tab" type="button" role="tab" aria-selected="false" aria-controls="signup-form">Create account</button>
+        </div>
+        <form id="signin-form" class="auth-form">
+          <label>Email address<input id="signin-email" type="email" autocomplete="email" required maxlength="120" placeholder="you@example.com"></label>
+          <label>Password<input id="signin-password" type="password" autocomplete="current-password" required minlength="6" maxlength="100" placeholder="Enter your password"></label>
+          <p class="auth-feedback" id="signin-feedback" role="status" aria-live="polite"></p>
+          <button class="primary-button auth-submit" type="submit">Sign in <span aria-hidden="true">→</span></button>
+        </form>
+        <form id="signup-form" class="auth-form" hidden>
+          <label>Full name<input id="signup-name" type="text" autocomplete="name" required maxlength="80" placeholder="Your full name"></label>
+          <label>Email address<input id="signup-email" type="email" autocomplete="email" required maxlength="120" placeholder="you@example.com"></label>
+          <label>Create password<input id="signup-password" type="password" autocomplete="new-password" required minlength="6" maxlength="100" placeholder="At least 6 characters"></label>
+          <label>Confirm password<input id="signup-confirm-password" type="password" autocomplete="new-password" required minlength="6" maxlength="100" placeholder="Enter it again"></label>
+          <p class="auth-feedback" id="signup-feedback" role="status" aria-live="polite"></p>
+          <button class="primary-button auth-submit" type="submit">Create my account <span aria-hidden="true">→</span></button>
+        </form>
+        <div class="auth-divider"><span>or</span></div>
+        <button class="demo-account-button" id="demo-account-button" type="button"><span class="demo-account-icon" aria-hidden="true">✧</span><span><strong>Continue with demo account</strong><small>Explore the site without creating an account</small></span><span aria-hidden="true">→</span></button>
+        <p class="auth-legal">Prototype notice: accounts are saved in this browser only. Do not use a real or reused password. This demo is not secure production authentication.</p>
+      </div>
+    </div>
+  </section>
+
   <header class="site-header">
     <a class="brand" href="#" data-view="home" aria-label="MindFull Carrier home">
       <span class="brand-mark">M</span>
@@ -19,7 +67,8 @@
       <button class="nav-link nav-button" type="button" data-view="guidance">Guidance</button>
       <button class="nav-link nav-button" type="button" data-view="partnership">Partnership</button>
     </nav>
-    <span class="header-note"><span class="status-dot"></span>Your next step starts here</span>
+    <span class="header-note"><span class="status-dot"></span><span id="signed-in-label">Your next step starts here</span></span>
+    <button class="nav-link nav-button auth-logout" id="signout-button" type="button" hidden>Sign out</button>
   </header>
 
   <main>
