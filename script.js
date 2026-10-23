@@ -700,10 +700,30 @@ const savedBookingsSection = document.querySelector("#saved-bookings");
 const savedBookingsList = document.querySelector("#saved-bookings-list");
 const bookingStorageKey = "mindfullCarrier.demoMentorRequests";
 const mentorProfiles = {
-  alex: { name: "Alex Rivera", specialty: "Frontend and full-stack development" },
-  samira: { name: "Samira Khan", specialty: "Python, data analysis, and AI projects" },
-  jordan: { name: "Jordan Miles", specialty: "Resume, communication, and interviews" },
-  dev: { name: "Dev Patel", specialty: "Higher studies and research planning" }
+  emp1: { name: "Maya Bennett", category: "employment", tag: "Software development", specialty: "Frontend & full-stack development", education: "B.Tech in Computer Science (sample profile)", skills: ["HTML, CSS, JavaScript", "React and REST APIs", "Git, portfolio projects", "Junior developer interviews"], helps: "Build a job-ready portfolio and prepare for entry-level software roles." },
+  emp2: { name: "Arjun Mehta", category: "employment", tag: "Data & analytics", specialty: "Python, SQL & data analysis", education: "B.Sc. in Statistics with a data analytics specialization (sample profile)", skills: ["Python and pandas", "SQL and data cleaning", "Dashboards and visualization", "Explaining project insights"], helps: "Plan practical analytics projects and prepare for junior data analyst roles." },
+  emp3: { name: "Elena Brooks", category: "employment", tag: "Design & product", specialty: "UI/UX and product design", education: "B.Des. in Interaction Design (sample profile)", skills: ["User research", "Wireframes and prototypes", "Figma design systems", "Portfolio case studies"], helps: "Turn design practice into clear case studies and prepare for junior design roles." },
+  emp4: { name: "Kabir Shah", category: "employment", tag: "Business careers", specialty: "Operations, communication & hiring prep", education: "BBA with a human resources specialization (sample profile)", skills: ["Resume structuring", "Behavioral interviews", "Professional communication", "Excel and workflow planning"], helps: "Translate your experience into strong applications for entry-level business roles." },
+
+  hs1: { name: "Dr. Nisha Raman", category: "higher-studies", tag: "Master's & research", specialty: "M.Tech / MS in computer science", education: "Ph.D. in Computer Science (sample profile)", skills: ["Program and prerequisite comparison", "Statement of purpose planning", "Research interest mapping", "Application timeline planning"], helps: "Compare postgraduate pathways and prepare a realistic application checklist." },
+  hs2: { name: "Oliver Chen", category: "higher-studies", tag: "AI & machine learning", specialty: "AI/ML postgraduate pathways", education: "M.Tech in Artificial Intelligence (sample profile)", skills: ["Math and ML foundations", "Research paper reading", "Project portfolio planning", "Entrance preparation strategy"], helps: "Identify skill gaps and organize preparation for AI/ML study options." },
+  hs3: { name: "Priya Nair", category: "higher-studies", tag: "Management studies", specialty: "MBA and business programs", education: "MBA in Strategy and Operations (sample profile)", skills: ["Program comparison", "Entrance exam planning", "Profile building", "Scholarship and budget research"], helps: "Compare management programs and build a profile-development plan." },
+  hs4: { name: "Daniel Okafor", category: "higher-studies", tag: "Study abroad", specialty: "International applications & funding research", education: "M.Sc. in Information Systems (sample profile)", skills: ["University shortlist criteria", "Application document planning", "Funding and scholarship research", "Academic CV structure"], helps: "Create a checklist for researching international programs and their official requirements." },
+
+  gov1: { name: "Sahana Iyer", category: "government-jobs", tag: "Civil services", specialty: "UPSC / state public service preparation", education: "M.A. in Political Science (sample profile)", skills: ["Syllabus breakdown", "Current affairs routine", "Answer-writing practice", "Revision planning"], helps: "Turn a broad civil-services syllabus into a manageable study routine." },
+  gov2: { name: "Rohit Kulkarni", category: "government-jobs", tag: "SSC & banking", specialty: "Aptitude-based competitive exams", education: "B.Com. with quantitative aptitude coaching experience (sample profile)", skills: ["Quantitative aptitude", "Reasoning practice", "English and comprehension", "Mock-test analysis"], helps: "Build a practice schedule and review mock-test errors systematically." },
+  gov3: { name: "Fatima Qureshi", category: "government-jobs", tag: "Railway & public sector", specialty: "Railway and general recruitment exams", education: "B.Sc. in Mathematics (sample profile)", skills: ["Arithmetic and reasoning", "General awareness planning", "Previous-paper analysis", "Timed practice"], helps: "Organize exam preparation around the current official syllabus and previous papers." },
+  gov4: { name: "Vikram Desai", category: "government-jobs", tag: "Technical recruitment", specialty: "Technical government and PSU pathways", education: "B.E. in Electrical Engineering (sample profile)", skills: ["Core-subject revision", "Technical MCQs", "Exam calendar tracking", "Error-log review"], helps: "Map technical subjects to relevant recruitment notifications and revision goals." },
+
+  cc1: { name: "Ananya Bose", category: "college-career", tag: "Academic planning", specialty: "Study routines & subject mastery", education: "M.Sc. in Computer Science (sample profile)", skills: ["Semester planning", "Active recall", "Exam preparation", "Time management"], helps: "Build a sustainable study plan that balances classes, exams, and projects." },
+  cc2: { name: "Marcus Reed", category: "college-career", tag: "Projects & portfolios", specialty: "College projects and GitHub portfolios", education: "M.S. in Software Engineering (sample profile)", skills: ["Project scoping", "Git and GitHub", "Documentation and demos", "Team collaboration"], helps: "Shape a college project into a clear, documented portfolio piece." },
+  cc3: { name: "Keerthana Reddy", category: "college-career", tag: "Internships", specialty: "Internship search & interview practice", education: "B.Tech in Information Technology (sample profile)", skills: ["Resume tailoring", "Role-specific applications", "Technical practice plans", "Application tracking"], helps: "Create an internship application routine and prepare for common screening rounds." },
+  cc4: { name: "Ethan Williams", category: "college-career", tag: "Research & communication", specialty: "Research basics and presentations", education: "M.Phil. in Information Studies (sample profile)", skills: ["Literature search", "Citation basics", "Presentation structure", "Explaining technical ideas"], helps: "Plan a small research exploration and present your learning clearly." },
+
+  ent1: { name: "Meera Kapoor", category: "entrepreneurship", tag: "Startup validation", specialty: "Idea validation & business models", education: "MBA in Entrepreneurship (sample profile)", skills: ["Customer interviews", "Problem validation", "Business model canvas", "Simple MVP planning"], helps: "Test whether a problem is worth solving before investing heavily in an idea." },
+  ent2: { name: "Lucas Martin", category: "entrepreneurship", tag: "Product & technology", specialty: "Building an early product", education: "B.S. in Computer Science (sample profile)", skills: ["MVP feature planning", "Web product fundamentals", "User feedback loops", "Release prioritization"], helps: "Turn an idea into a small, testable first version and gather feedback." },
+  ent3: { name: "Aditi Menon", category: "entrepreneurship", tag: "Marketing & growth", specialty: "Digital marketing and customer discovery", education: "M.Com. in Marketing (sample profile)", skills: ["Audience research", "Content strategy", "Basic analytics", "Customer acquisition experiments"], helps: "Plan low-cost experiments to understand customers and reach an initial audience." },
+  ent4: { name: "Noah Thompson", category: "entrepreneurship", tag: "Finance & operations", specialty: "Startup budgeting and operations", education: "B.Com. with a finance specialization (sample profile)", skills: ["Cost and pricing basics", "Cash-flow planning", "Operations checklists", "Simple business metrics"], helps: "Estimate basic costs and organize day-to-day tasks before scaling a small venture." }
 };
 let chosenMentorId = null;
 
@@ -719,6 +739,60 @@ function showHistory() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function renderMentorCards() {
+  const grid = document.querySelector("#mentor-grid");
+  const summary = document.querySelector("#mentor-match-summary");
+  if (!grid || !summary) return;
+  grid.replaceChildren();
+  const matched = selectedCategory
+    ? Object.entries(mentorProfiles).filter(([, mentor]) => mentor.category === selectedCategory)
+    : Object.entries(mentorProfiles);
+  summary.textContent = selectedCategory
+    ? "Showing " + matched.length + " sample mentors for " + categoryNames[selectedCategory] + ". Their study backgrounds and skills are shown so you can compare relevant support."
+    : "Choose a Guidance category first to see four matching sample mentors, or explore all 20 profiles below.";
+  matched.forEach(([id, mentor], index) => {
+    const card = document.createElement("article");
+    card.className = "mentor-card";
+    const avatar = document.createElement("div");
+    avatar.className = "mentor-avatar" + (index % 4 === 1 ? " mentor-avatar-teal" : index % 4 === 2 ? " mentor-avatar-amber" : index % 4 === 3 ? " mentor-avatar-rose" : "");
+    avatar.setAttribute("aria-hidden", "true");
+    avatar.textContent = mentor.name.split(/\\s+/).map((part) => part[0]).slice(0, 2).join("").toUpperCase();
+    const tag = document.createElement("span");
+    tag.className = "mentor-tag";
+    tag.textContent = mentor.tag;
+    const name = document.createElement("h2");
+    name.textContent = mentor.name;
+    const specialty = document.createElement("p");
+    specialty.className = "mentor-specialty";
+    specialty.textContent = mentor.specialty;
+    const education = document.createElement("p");
+    education.className = "mentor-detail";
+    const educationLabel = document.createElement("strong");
+    educationLabel.textContent = "Studies: ";
+    education.append(educationLabel, document.createTextNode(mentor.education));
+    const skillsHeading = document.createElement("p");
+    skillsHeading.className = "mentor-detail-label";
+    skillsHeading.textContent = "Skills";
+    const skills = document.createElement("ul");
+    skills.className = "mentor-skill-list";
+    mentor.skills.forEach((skill) => {
+      const item = document.createElement("li");
+      item.textContent = skill;
+      skills.appendChild(item);
+    });
+    const helps = document.createElement("p");
+    helps.className = "mentor-helps";
+    helps.textContent = mentor.helps;
+    const choose = document.createElement("button");
+    choose.className = "primary-button mentor-select";
+    choose.type = "button";
+    choose.dataset.mentor = id;
+    choose.textContent = "Choose mentor";
+    card.append(avatar, tag, name, specialty, education, skillsHeading, skills, helps, choose);
+    grid.appendChild(card);
+  });
+}
+
 function showMentors() {
   saveCurrentPage("mentors");
   homeScreen.hidden = true;
@@ -730,6 +804,7 @@ function showMentors() {
   bookingPanel.hidden = true;
   bookingForm.hidden = false;
   bookingConfirmation.hidden = true;
+  renderMentorCards();
   renderSavedBookings();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -891,7 +966,7 @@ function chooseMentor(mentorId) {
   if (!mentorProfiles[mentorId]) return;
   chosenMentorId = mentorId;
   const mentor = mentorProfiles[mentorId];
-  bookingMentorSummary.textContent = mentor.name + " · " + mentor.specialty;
+  bookingMentorSummary.textContent = mentor.name + " · " + mentor.specialty + " · Studies: " + mentor.education + " · Skills: " + mentor.skills.join(", ");
   bookingPanel.hidden = false;
   bookingForm.hidden = false;
   bookingConfirmation.hidden = true;
@@ -932,8 +1007,9 @@ document.querySelector("#back-to-guidance").addEventListener("click", () => {
   guidanceContent.hidden = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
-document.querySelectorAll("[data-mentor]").forEach((button) => {
-  button.addEventListener("click", () => chooseMentor(button.dataset.mentor));
+document.querySelector("#mentor-grid").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-mentor]");
+  if (button) chooseMentor(button.dataset.mentor);
 });
 document.querySelector("#cancel-booking").addEventListener("click", () => {
   bookingPanel.hidden = true;
