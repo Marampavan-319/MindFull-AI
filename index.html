@@ -236,32 +236,11 @@
         <h1>Find a mentor for your next step.</h1>
         <p>Explore demo mentor profiles and choose a session length. This is a prototype: mentors, time slots, and bookings are simulated, not real appointments.</p>
       </div>
-      <div class="mentor-grid" id="mentor-grid">
-        <article class="mentor-card">
-          <div class="mentor-avatar" aria-hidden="true">AR</div><span class="mentor-tag">Web &amp; software</span>
-          <h2>Alex Rivera</h2><p class="mentor-specialty">Frontend and full-stack development</p>
-          <p>Get help planning a portfolio, understanding web fundamentals, and preparing for junior developer interviews.</p>
-          <button class="primary-button mentor-select" type="button" data-mentor="alex">Choose mentor</button>
-        </article>
-        <article class="mentor-card">
-          <div class="mentor-avatar mentor-avatar-teal" aria-hidden="true">SK</div><span class="mentor-tag">Data &amp; AI</span>
-          <h2>Samira Khan</h2><p class="mentor-specialty">Python, data analysis, and AI projects</p>
-          <p>Turn a learning goal into a manageable project and practise explaining technical decisions clearly.</p>
-          <button class="primary-button mentor-select" type="button" data-mentor="samira">Choose mentor</button>
-        </article>
-        <article class="mentor-card">
-          <div class="mentor-avatar mentor-avatar-amber" aria-hidden="true">JM</div><span class="mentor-tag">Career readiness</span>
-          <h2>Jordan Miles</h2><p class="mentor-specialty">Resume, communication, and interviews</p>
-          <p>Organize your experience, improve project stories, and build a practical preparation routine.</p>
-          <button class="primary-button mentor-select" type="button" data-mentor="jordan">Choose mentor</button>
-        </article>
-        <article class="mentor-card">
-          <div class="mentor-avatar mentor-avatar-rose" aria-hidden="true">DP</div><span class="mentor-tag">Study &amp; research</span>
-          <h2>Dev Patel</h2><p class="mentor-specialty">Higher studies and research planning</p>
-          <p>Compare study options, map prerequisites, and create a checklist for researching programs.</p>
-          <button class="primary-button mentor-select" type="button" data-mentor="dev">Choose mentor</button>
-        </article>
+      <div class="mentor-match-summary" id="mentor-match-summary" aria-live="polite"></div>
+      <div class="mentor-demo-notice">
+        <strong>Demo profile transparency:</strong> these 20 mentor profiles, education details, and skill sets are illustrative examples for this prototype—not verified real people or credentials. Real mentor availability and paid sessions are not yet connected.
       </div>
+      <div class="mentor-grid" id="mentor-grid" aria-live="polite"></div>
 
       <section class="booking-panel" id="booking-panel" hidden>
         <div class="booking-heading"><span class="eyebrow">SESSION REQUEST</span><h2>Plan your mentoring session</h2><p id="booking-mentor-summary">Choose a demo mentor to continue.</p></div>
