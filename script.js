@@ -1568,8 +1568,8 @@ function renderPartnershipDashboard() {
 function csvSafeCell(value) {
   let textValue = value === null || value === undefined ? "" : String(value);
   // Prefix formula-like cells to reduce spreadsheet formula-injection risk.
-  if (/^\\s*[=+@-]/.test(textValue)) textValue = "'" + textValue;
-  return '"' + textValue.replace(/"/g, '""').replace(/\\r?\\n/g, " ") + '"';
+  if (/^\s*[=+@-]/.test(textValue)) textValue = "'" + textValue;
+  return '"' + textValue.replace(/"/g, '""').replace(/\r?\n/g, " ") + '"';
 }
 
 function exportPartnershipCsv() {
@@ -1593,7 +1593,7 @@ function exportPartnershipCsv() {
       return csvSafeCell(value);
     }).join(","));
   });
-  const csv = "\\uFEFF" + rows.join("\\r\\n");
+  const csv = "\uFEFF" + rows.join("\r\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
