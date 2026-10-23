@@ -1329,6 +1329,7 @@ signoutButton.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
+renderPartnershipDashboard();
 restoreAuthSession();
 
 
@@ -1338,6 +1339,127 @@ const partnershipSuccess = document.querySelector("#partnership-success");
 const partnershipSuccessText = document.querySelector("#partnership-success-text");
 const partnershipFeedback = document.querySelector("#partner-form-feedback");
 const partnershipInquiryStorageKey = "mindfullCarrier.partnershipInquiries";
+
+const partnershipDashboardList = document.querySelector("#partnership-dashboard-list");
+const partnershipDashboardEmpty = document.querySelector("#partnership-dashboard-empty");
+const partnershipDashboardSearch = document.querySelector("#partner-dashboard-search");
+const partnershipDashboardCategory = document.querySelector("#partner-dashboard-category");
+const partnershipDashboardStatus = document.querySelector("#partner-dashboard-status");
+const partnershipStatusLabels = { new: "New", reviewing: "Reviewing", contacted: "Contacted", closed: "Closed" };
+
+function readPartnershipInquiries() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(partnershipInquiryStorageKey) || "[]");
+    if (!Array.isArray(saved)) return [];
+    let changed = false;
+    saved.forEach((inquiry) => {
+      if (!inquiry.referenceId) { inquiry.referenceId = "MF-P-" + Number(inquiry.createdAt || inquiry.id || Date.now()).toString(36).toUpperCase(); changed = true; }
+      if (!partnershipStatusLabels[inquiry.status]) { inquiry.status = "new"; changed = true; }
+      if (!inquiry.updatedAt) { inquiry.updatedAt = Number(inquiry.createdAt || inquiry.id || Date.now()); changed = true; }
+    });
+    if (changed) localStorage.setItem(partnershipInquiryStorageKey, JSON.stringify(saved));
+    return saved;
+  } catch (error) { return []; }
+}
+
+function savePartnershipInquiries(inquiries) {
+  try {
+    localStorage.setItem(partnershipInquiryStorageKey, JSON.stringify(inquiries.slice(0, 50)));
+    return true;
+  } catch (error) {
+    showToast("Could not save the inquiry update. Check browser storage and try again.");
+    return false;
+  }
+}
+
+function renderPartnershipDashboard() {
+  if (!partnershipDashboardList) return;
+  const inquiries = readPartnershipInquiries().sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0));
+  document.querySelector("#partner-stat-total").textContent = String(inquiries.length);
+  document.querySelector("#partner-stat-new").textContent = String(inquiries.filter((item) => item.status === "new").length);
+  document.querySelector("#partner-stat-progress").textContent = String(inquiries.filter((item) => item.status === "reviewing" || item.status === "contacted").length);
+  document.querySelector("#partner-stat-closed").textContent = String(inquiries.filter((item) => item.status === "closed").length);
+  const query = partnershipDashboardSearch.value.trim().toLowerCase();
+  const category = partnershipDashboardCategory.value;
+  const statusFilter = partnershipDashboardStatus.value;
+  const visible = inquiries.filter((item) => {
+    const searchable = [item.referenceId, item.name, item.email, item.organization, item.type, item.message].join(" ").toLowerCase();
+    return (!query || searchable.includes(query)) &&
+      (category === "all" || item.type === category) &&
+      (statusFilter === "all" || item.status === statusFilter);
+  });
+  partnershipDashboardList.replaceChildren();
+  partnershipDashboardEmpty.hidden = visible.length > 0;
+  partnershipDashboardEmpty.textContent = inquiries.length === 0
+    ? "No partnership inquiries yet. Submit the inquiry form below to add your first record."
+    : "No inquiries match these filters. Try a different search, category, or status.";
+  visible.forEach((inquiry) => {
+    const card = document.createElement("article");
+    card.className = "partnership-inquiry-card";
+    const top = document.createElement("div");
+    top.className = "partnership-inquiry-card-top";
+    const identity = document.createElement("div");
+    const title = document.createElement("h3");
+    title.textContent = inquiry.organization || inquiry.name || "Partnership inquiry";
+    const meta = document.createElement("p");
+    meta.className = "partnership-inquiry-meta";
+    meta.textContent = (inquiry.type || "Other collaboration") + " · " + (inquiry.name || "Name not provided") + " · " + (inquiry.email || "Email not provided");
+    const reference = document.createElement("span");
+    reference.className = "partnership-reference";
+    reference.textContent = inquiry.referenceId;
+    identity.append(title, meta);
+    top.append(identity, reference);
+    const statusRow = document.createElement("div");
+    statusRow.className = "partnership-status-row";
+    const statusLabel = document.createElement("label");
+    statusLabel.appendChild(document.createTextNode("Tracking status"));
+    const statusSelect = document.createElement("select");
+    statusSelect.className = "partnership-status-select";
+    statusSelect.setAttribute("aria-label", "Tracking status for " + (inquiry.referenceId || inquiry.name));
+    Object.entries(partnershipStatusLabels).forEach(([value, label]) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      option.selected = inquiry.status === value;
+      statusSelect.appendChild(option);
+    });
+    const statusFeedback = document.createElement("span");
+    statusFeedback.className = "partnership-status-feedback";
+    statusFeedback.setAttribute("role", "status");
+    statusFeedback.textContent = "Last updated: " + new Date(Number(inquiry.updatedAt || inquiry.createdAt || Date.now())).toLocaleString();
+    statusSelect.addEventListener("change", () => {
+      const all = readPartnershipInquiries();
+      const target = all.find((item) => String(item.id) === String(inquiry.id) || item.referenceId === inquiry.referenceId);
+      if (!target) return;
+      target.status = statusSelect.value;
+      target.updatedAt = Date.now();
+      if (savePartnershipInquiries(all)) {
+        statusFeedback.textContent = "Status saved · " + new Date(target.updatedAt).toLocaleString();
+        renderPartnershipDashboard();
+        renderHistory();
+      }
+    });
+    statusLabel.appendChild(statusSelect);
+    statusRow.append(statusLabel, statusFeedback);
+    const message = document.createElement("p");
+    message.className = "partnership-inquiry-message";
+    message.textContent = inquiry.message || "No collaboration details provided.";
+    const date = document.createElement("p");
+    date.className = "partnership-inquiry-meta";
+    date.textContent = "Submitted: " + (inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleString() : "Date not recorded");
+    card.append(top, statusRow, message, date);
+    partnershipDashboardList.appendChild(card);
+  });
+}
+
+[partnershipDashboardSearch, partnershipDashboardCategory, partnershipDashboardStatus].forEach((control) => {
+  control.addEventListener("input", renderPartnershipDashboard);
+  control.addEventListener("change", renderPartnershipDashboard);
+});
+document.querySelector("#partnership-dashboard-refresh").addEventListener("click", () => {
+  renderPartnershipDashboard();
+  showToast("Partnership dashboard refreshed.");
+});
 
 document.querySelectorAll("[data-partner-type]").forEach((button) => {
   button.addEventListener("click", () => {
@@ -1352,14 +1474,18 @@ partnershipInquiryForm.addEventListener("submit", (event) => {
   partnershipFeedback.textContent = "";
   partnershipFeedback.classList.remove("success");
   if (!partnershipInquiryForm.reportValidity()) return;
+  const createdAt = Date.now();
   const inquiry = {
-    id: Date.now(),
+    id: createdAt,
+    referenceId: "MF-P-" + createdAt.toString(36).toUpperCase(),
     name: document.querySelector("#partner-name").value.trim(),
     email: document.querySelector("#partner-email").value.trim(),
     type: document.querySelector("#partner-type").value,
     organization: document.querySelector("#partner-organization").value.trim(),
     message: document.querySelector("#partner-message").value.trim(),
-    createdAt: Date.now()
+    status: "new",
+    createdAt,
+    updatedAt: createdAt
   };
   if (inquiry.name.length < 2 || inquiry.message.length < 10) {
     partnershipFeedback.textContent = "Please add your name and a little more detail about the collaboration.";
@@ -1378,6 +1504,7 @@ partnershipInquiryForm.addEventListener("submit", (event) => {
   partnershipInquiryForm.hidden = true;
   partnershipSuccess.hidden = false;
   partnershipSuccessText.textContent = "Your demo inquiry as " + inquiry.type + " has been saved on this device. You can see the confirmation here, but it has not been emailed or sent to a team.";
+  renderPartnershipDashboard();
   partnershipSuccess.scrollIntoView({ behavior: "smooth", block: "center" });
 });
 
