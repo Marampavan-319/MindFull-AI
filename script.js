@@ -32,6 +32,24 @@ let selectedCategory = null;
 let currentQuestionIndex = 0;
 let answers = {};
 let toastTimer = null;
+const pageStorageKey = "mindfullCarrier.lastPage";
+const pageReturnStorageKey = "mindfullCarrier.pageBeforeAuth";
+const assessmentStateKey = "mindfullCarrier.assessmentState";
+
+function saveCurrentPage(page) {
+  try { localStorage.setItem(pageStorageKey, page); } catch (error) { /* Page still works if storage is disabled. */ }
+}
+
+function saveAssessmentState(resultsVisible = false) {
+  try {
+    localStorage.setItem(assessmentStateKey, JSON.stringify({
+      selectedCategory,
+      currentQuestionIndex,
+      answers,
+      resultsVisible
+    }));
+  } catch (error) { /* Assessment still works if storage is disabled. */ }
+}
 
 const categoryNames = {
   employment: "Employment",
@@ -117,6 +135,7 @@ function showToast(message) {
 }
 
 function showView(view) {
+  saveCurrentPage(view);
   homeScreen.hidden = view !== "home";
   guidanceContent.hidden = view !== "guidance";
   partnershipScreen.hidden = view !== "partnership";
@@ -160,6 +179,8 @@ function startAssessment() {
   assessmentIntro.textContent = "Answer five short questions about your interests and preferences. There are no right or wrong answers.";
   guidanceContent.hidden = true;
   assessmentScreen.hidden = false;
+  saveCurrentPage("assessment");
+  saveAssessmentState(false);
   renderQuestion();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -192,6 +213,7 @@ function renderQuestion() {
     radio.checked = answers[currentQuestionIndex] === index;
     radio.addEventListener("change", () => {
       answers[currentQuestionIndex] = index;
+      saveAssessmentState(false);
       formHint.textContent = "Answer saved. You can change it before viewing your guidance.";
       formHint.classList.remove("error");
     });
@@ -217,11 +239,13 @@ continueButton.addEventListener("click", startAssessment);
 nextQuestionButton.addEventListener("click", () => {
   if (!hasAnswerForCurrentQuestion()) return;
   currentQuestionIndex += 1;
+  saveAssessmentState(false);
   renderQuestion();
 });
 previousQuestionButton.addEventListener("click", () => {
   if (currentQuestionIndex > 0) {
     currentQuestionIndex -= 1;
+    saveAssessmentState(false);
     renderQuestion();
   }
 });
@@ -429,16 +453,20 @@ function showResults() {
   });
   assessmentForm.hidden = true;
   resultsPanel.hidden = false;
+  saveCurrentPage("assessment");
+  saveAssessmentState(true);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 document.querySelector("#back-to-paths").addEventListener("click", () => {
+  saveCurrentPage("guidance");
   assessmentScreen.hidden = true;
   guidanceContent.hidden = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 document.querySelector("#retake-assessment").addEventListener("click", startAssessment);
 document.querySelector("#change-path").addEventListener("click", () => {
+  saveCurrentPage("guidance");
   assessmentScreen.hidden = true;
   guidanceContent.hidden = false;
   window.scrollTo({ top: document.querySelector("#career-paths").offsetTop - 90, behavior: "smooth" });
@@ -677,6 +705,7 @@ const mentorProfiles = {
 let chosenMentorId = null;
 
 function showMentors() {
+  saveCurrentPage("mentors");
   homeScreen.hidden = true;
   guidanceContent.hidden = true;
   assessmentScreen.hidden = true;
@@ -758,6 +787,7 @@ updateBookingPrice();
 
 document.querySelector("#find-mentor").addEventListener("click", showMentors);
 document.querySelector("#back-to-guidance").addEventListener("click", () => {
+  saveCurrentPage("guidance");
   mentorsScreen.hidden = true;
   guidanceContent.hidden = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -881,7 +911,11 @@ completeDemoPaymentButton.addEventListener("click", () => {
     currentSession = null;
   }
   if (currentSession && currentSession.demo) {
-    try { localStorage.removeItem(authSessionKey); } catch (error) { /* Keep the sign-in gate visible even if storage is unavailable. */ }
+    try {
+      localStorage.setItem(pageReturnStorageKey, "mentors");
+      localStorage.setItem(pageStorageKey, "auth");
+      localStorage.removeItem(authSessionKey);
+    } catch (error) { /* Keep the sign-in gate visible even if storage is unavailable. */ }
     authScreen.hidden = false;
     signoutButton.hidden = true;
     showAuthMode("signin");
@@ -1003,20 +1037,82 @@ function enterApplication(user, isDemo = false) {
   authScreen.hidden = true;
   signoutButton.hidden = false;
   signedInLabel.textContent = "Hi, " + session.name.split(" ")[0];
+  let nextPage = "home";
+  try {
+    nextPage = localStorage.getItem(pageStorageKey) || "home";
+    if (nextPage === "auth") nextPage = localStorage.getItem(pageReturnStorageKey) || "home";
+    localStorage.setItem(pageStorageKey, nextPage);
+    localStorage.removeItem(pageReturnStorageKey);
+  } catch (error) { /* Default to home if page state cannot be read. */ }
+  restoreAppPage(nextPage);
   window.scrollTo({ top: 0, behavior: "smooth" });
   showToast(isDemo ? "Welcome! You're exploring with the demo account." : "Welcome back, " + session.name.split(" ")[0] + "!");
+}
+
+function restoreAppPage(page) {
+  homeScreen.hidden = true;
+  guidanceContent.hidden = true;
+  partnershipScreen.hidden = true;
+  assessmentScreen.hidden = true;
+  mentorsScreen.hidden = true;
+
+  if (page === "home" || !page) {
+    showView("home");
+    return;
+  }
+  if (page === "guidance" || page === "partnership") {
+    showView(page);
+    return;
+  }
+  if (page === "mentors") {
+    showMentors();
+    return;
+  }
+  if (page === "assessment") {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(assessmentStateKey) || "null"); } catch (error) { saved = null; }
+    if (!saved || !questionSets[saved.selectedCategory]) {
+      showView("guidance");
+      return;
+    }
+    selectedCategory = saved.selectedCategory;
+    answers = saved.answers && typeof saved.answers === "object" ? saved.answers : {};
+    currentQuestionIndex = Math.max(0, Math.min(Number(saved.currentQuestionIndex) || 0, questionSets[selectedCategory].length - 1));
+    careerCards.forEach((card) => {
+      const isSelected = card.dataset.category === selectedCategory;
+      card.classList.toggle("selected", isSelected);
+      card.setAttribute("aria-pressed", String(isSelected));
+    });
+    assessmentTitle.textContent = "Let's explore " + categoryNames[selectedCategory].toLowerCase() + ".";
+    assessmentIntro.textContent = "Answer five short questions about your interests and preferences. There are no right or wrong answers.";
+    guidanceContent.hidden = true;
+    assessmentScreen.hidden = false;
+    if (saved.resultsVisible) {
+      renderQuestion();
+      showResults();
+    } else {
+      resultsPanel.hidden = true;
+      assessmentForm.hidden = false;
+      renderQuestion();
+    }
+    return;
+  }
+  showView("home");
 }
 
 function restoreAuthSession() {
   try {
     const session = JSON.parse(localStorage.getItem(authSessionKey) || "null");
-    if (session && session.name) {
+    const lastPage = localStorage.getItem(pageStorageKey) || "home";
+    if (session && session.name && lastPage !== "auth") {
       authScreen.hidden = true;
       signoutButton.hidden = false;
       signedInLabel.textContent = "Hi, " + session.name.split(" ")[0];
+      restoreAppPage(lastPage);
     } else {
       authScreen.hidden = false;
       signoutButton.hidden = true;
+      if (lastPage !== "auth") restoreAppPage(lastPage);
     }
   } catch (error) {
     authScreen.hidden = false;
@@ -1084,7 +1180,11 @@ demoAccountButton.addEventListener("click", () => {
 });
 
 signoutButton.addEventListener("click", () => {
-  try { localStorage.removeItem(authSessionKey); } catch (error) { /* Sign-out still hides the app locally. */ }
+  try {
+    localStorage.removeItem(authSessionKey);
+    localStorage.setItem(pageReturnStorageKey, localStorage.getItem(pageStorageKey) || "home");
+    localStorage.setItem(pageStorageKey, "auth");
+  } catch (error) { /* Sign-out still hides the app locally. */ }
   authScreen.hidden = false;
   signoutButton.hidden = true;
   showAuthMode("signin");
