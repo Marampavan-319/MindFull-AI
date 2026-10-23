@@ -1344,10 +1344,6 @@ signoutButton.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-renderPartnershipDashboard();
-restoreAuthSession();
-
-
 // Partnership inquiries are prototype-only and remain in this browser.
 const partnershipInquiryForm = document.querySelector("#partnership-inquiry-form");
 const partnershipSuccess = document.querySelector("#partnership-success");
@@ -1530,3 +1526,7 @@ document.querySelector("#new-partnership-inquiry").addEventListener("click", () 
   partnershipFeedback.textContent = "";
   document.querySelector("#partnership-form").scrollIntoView({ behavior: "smooth", block: "start" });
 });
+
+// Initialize after every feature's state and event handlers have been declared.
+renderPartnershipDashboard();
+restoreAuthSession();
