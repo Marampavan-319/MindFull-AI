@@ -269,7 +269,30 @@
           <div class="booking-fields">
             <label>Full name<input id="booking-name" name="name" type="text" autocomplete="name" maxlength="80" required placeholder="Your name"></label>
             <label>Email address<input id="booking-email" name="email" type="email" autocomplete="email" maxlength="120" required placeholder="you@example.com"></label>
-            <label>Session length<select id="booking-duration" name="duration" required><option value="30">30 minutes — ₹299</option><option value="60">60 minutes — ₹499</option></select></label>
+            <div class="booking-duration-field">
+              <span class="booking-field-label" id="booking-duration-label">Choose your session</span>
+              <div class="duration-card-grid" role="group" aria-labelledby="booking-duration-label">
+                <button class="duration-card selected" type="button" data-duration="30" aria-pressed="true">
+                  <span class="duration-card-top"><span class="duration-card-icon" aria-hidden="true">◷</span><span class="duration-card-check" aria-hidden="true">✓</span></span>
+                  <span class="duration-card-name">Quick session</span>
+                  <strong class="duration-card-time">30 <small>minutes</small></strong>
+                  <span class="duration-card-description">Focus on one question or challenge.</span>
+                  <span class="duration-card-price">₹299</span>
+                </button>
+                <button class="duration-card" type="button" data-duration="60" aria-pressed="false">
+                  <span class="duration-card-badge">More time</span>
+                  <span class="duration-card-top"><span class="duration-card-icon" aria-hidden="true">✦</span><span class="duration-card-check" aria-hidden="true">✓</span></span>
+                  <span class="duration-card-name">Deep-dive session</span>
+                  <strong class="duration-card-time">60 <small>minutes</small></strong>
+                  <span class="duration-card-description">More time for planning and detailed guidance.</span>
+                  <span class="duration-card-price">₹499</span>
+                </button>
+              </div>
+              <select id="booking-duration" name="duration" required hidden aria-label="Session length">
+                <option value="30" selected>30 minutes</option>
+                <option value="60">60 minutes</option>
+              </select>
+            </div>
             <div class="booking-price-summary" aria-live="polite"><span>Session fee</span><strong id="booking-price">₹299</strong><small>Demo price only. No real payment will be collected.</small></div>
             <label>Preferred date<input id="booking-date" name="date" type="date" required></label>
             <label>Preferred time<select id="booking-time" name="time" required><option value="">Choose a time</option><option>10:00 AM</option><option>12:00 PM</option><option>2:00 PM</option><option>4:00 PM</option><option>6:00 PM</option></select></label>
