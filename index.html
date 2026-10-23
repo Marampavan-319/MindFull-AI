@@ -219,13 +219,14 @@
           <div class="booking-fields">
             <label>Full name<input id="booking-name" name="name" type="text" autocomplete="name" maxlength="80" required placeholder="Your name"></label>
             <label>Email address<input id="booking-email" name="email" type="email" autocomplete="email" maxlength="120" required placeholder="you@example.com"></label>
-            <label>Session length<select id="booking-duration" name="duration" required><option value="30">30 minutes</option><option value="60">60 minutes</option></select></label>
+            <label>Session length<select id="booking-duration" name="duration" required><option value="30">30 minutes — ₹299</option><option value="60">60 minutes — ₹499</option></select></label>
+            <div class="booking-price-summary" aria-live="polite"><span>Session fee</span><strong id="booking-price">₹299</strong><small>Demo price only. No real payment will be collected.</small></div>
             <label>Preferred date<input id="booking-date" name="date" type="date" required></label>
             <label>Preferred time<select id="booking-time" name="time" required><option value="">Choose a time</option><option>10:00 AM</option><option>12:00 PM</option><option>2:00 PM</option><option>4:00 PM</option><option>6:00 PM</option></select></label>
             <label class="booking-goal">What would you like help with?<textarea id="booking-goal" name="goal" rows="3" maxlength="500" required placeholder="Share your goal or question"></textarea></label>
           </div>
-          <p class="booking-disclaimer">Demo only: submitting saves a simulated request in this browser. It does not contact a mentor or reserve a real calendar slot.</p>
-          <div class="booking-actions"><button class="primary-button" type="submit">Save demo request</button><button class="secondary-button" id="cancel-booking" type="button">Choose another mentor</button></div>
+          <p class="booking-disclaimer">Demo only: this prototype shows an example session fee. It does not process payments, contact a mentor, or reserve a real calendar slot.</p>
+          <div class="booking-actions"><button class="primary-button" type="submit">Confirm demo booking</button><button class="secondary-button" id="cancel-booking" type="button">Choose another mentor</button></div>
         </form>
         <section class="booking-confirmation" id="booking-confirmation" hidden aria-live="polite">
           <span class="confirmation-check" aria-hidden="true">✓</span><h3>Demo request saved!</h3><p id="booking-confirmation-text"></p>
