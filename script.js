@@ -805,8 +805,9 @@ function renderHistory() {
       const title = document.createElement("h2");
       title.textContent = inquiry.type || "Partnership inquiry";
       const status = document.createElement("span");
-      status.className = "history-status history-status-pending";
-      status.textContent = "Saved locally · Not sent";
+      const inquiryStatus = partnershipStatusLabels[inquiry.status] || "New";
+      status.className = "history-status " + (inquiry.status === "closed" ? "history-status-paid" : "history-status-pending");
+      status.textContent = inquiryStatus + " · Saved locally";
       top.append(title, status);
       const details = document.createElement("div");
       details.className = "history-item-details";
