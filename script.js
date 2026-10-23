@@ -1409,6 +1409,46 @@ function getFilteredPartnershipInquiries() {
     });
 }
 
+const partnershipAdminSessionKey = "mindfullCarrier.demoPartnershipAdmin";
+const partnershipAdminAccessCode = "MFA-ADMIN-2026"; // Public demo gate only; never use this pattern for real security.
+
+function isPartnershipAdmin() {
+  try { return sessionStorage.getItem(partnershipAdminSessionKey) === "true"; }
+  catch (error) { return false; }
+}
+
+function updatePartnershipAdminUI() {
+  const admin = isPartnershipAdmin();
+  const toggle = document.querySelector("#partnership-admin-toggle");
+  const exportButton = document.querySelector("#partnership-export-csv");
+  const notice = document.querySelector("#partnership-admin-notice");
+  if (toggle) toggle.textContent = admin ? "Lock admin mode" : "Admin sign-in";
+  if (exportButton) exportButton.hidden = !admin;
+  if (notice) notice.textContent = admin
+    ? "Admin mode is active in this browser tab. You can update statuses, edit internal notes, schedule follow-ups, and export matching inquiries. Demo-only: this is not secure authentication."
+    : "Read-only view: inquiry statuses are managed by admins. Use Admin sign-in to enter the demo admin workspace. This frontend-only demo gate is not secure authentication.";
+}
+
+document.querySelector("#partnership-admin-toggle").addEventListener("click", () => {
+  if (isPartnershipAdmin()) {
+    sessionStorage.removeItem(partnershipAdminSessionKey);
+    updatePartnershipAdminUI();
+    renderPartnershipDashboard();
+    showToast("Admin mode locked.");
+    return;
+  }
+  const enteredCode = window.prompt("Demo admin access code:");
+  if (enteredCode === null) return;
+  if (enteredCode !== partnershipAdminAccessCode) {
+    showToast("Incorrect admin access code.");
+    return;
+  }
+  sessionStorage.setItem(partnershipAdminSessionKey, "true");
+  updatePartnershipAdminUI();
+  renderPartnershipDashboard();
+  showToast("Demo admin mode unlocked.");
+});
+
 function renderPartnershipDashboard() {
   if (!partnershipDashboardList) return;
   const inquiries = readPartnershipInquiries().sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0));
@@ -1442,33 +1482,41 @@ function renderPartnershipDashboard() {
     statusRow.className = "partnership-status-row";
     const statusLabel = document.createElement("label");
     statusLabel.appendChild(document.createTextNode("Tracking status"));
-    const statusSelect = document.createElement("select");
-    statusSelect.className = "partnership-status-select";
-    statusSelect.setAttribute("aria-label", "Tracking status for " + (inquiry.referenceId || inquiry.name));
-    Object.entries(partnershipStatusLabels).forEach(([value, label]) => {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = label;
-      option.selected = inquiry.status === value;
-      statusSelect.appendChild(option);
-    });
     const statusFeedback = document.createElement("span");
     statusFeedback.className = "partnership-status-feedback";
     statusFeedback.setAttribute("role", "status");
     statusFeedback.textContent = "Last updated: " + new Date(Number(inquiry.updatedAt || inquiry.createdAt || Date.now())).toLocaleString();
-    statusSelect.addEventListener("change", () => {
-      const all = readPartnershipInquiries();
-      const target = all.find((item) => String(item.id) === String(inquiry.id) || item.referenceId === inquiry.referenceId);
-      if (!target) return;
-      target.status = statusSelect.value;
-      target.updatedAt = Date.now();
-      if (savePartnershipInquiries(all)) {
-        statusFeedback.textContent = "Status saved · " + new Date(target.updatedAt).toLocaleString();
-        renderPartnershipDashboard();
-        renderHistory();
-      }
-    });
-    statusLabel.appendChild(statusSelect);
+    if (isPartnershipAdmin()) {
+      const statusSelect = document.createElement("select");
+      statusSelect.className = "partnership-status-select";
+      statusSelect.setAttribute("aria-label", "Tracking status for " + (inquiry.referenceId || inquiry.name));
+      Object.entries(partnershipStatusLabels).forEach(([value, label]) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        option.selected = inquiry.status === value;
+        statusSelect.appendChild(option);
+      });
+      statusSelect.addEventListener("change", () => {
+        if (!isPartnershipAdmin()) { renderPartnershipDashboard(); return; }
+        const all = readPartnershipInquiries();
+        const target = all.find((item) => String(item.id) === String(inquiry.id) || item.referenceId === inquiry.referenceId);
+        if (!target) return;
+        target.status = statusSelect.value;
+        target.updatedAt = Date.now();
+        if (savePartnershipInquiries(all)) {
+          statusFeedback.textContent = "Status saved · " + new Date(target.updatedAt).toLocaleString();
+          renderPartnershipDashboard();
+          renderHistory();
+        }
+      });
+      statusLabel.appendChild(statusSelect);
+    } else {
+      const readOnlyStatus = document.createElement("span");
+      readOnlyStatus.className = "partnership-readonly-status";
+      readOnlyStatus.textContent = partnershipStatusLabels[inquiry.status] || "New";
+      statusLabel.appendChild(readOnlyStatus);
+    }
     statusRow.append(statusLabel, statusFeedback);
     const date = document.createElement("p");
     date.className = "partnership-inquiry-meta";
@@ -1499,56 +1547,65 @@ function renderPartnershipDashboard() {
     fullMessage.textContent = inquiry.message || "No collaboration details provided.";
     messageLabel.appendChild(fullMessage);
 
-    const notesLabel = document.createElement("label");
-    notesLabel.className = "partnership-detail-field";
-    notesLabel.textContent = "Internal notes (saved only on this device)";
-    const notesInput = document.createElement("textarea");
-    notesInput.className = "partnership-notes-input";
-    notesInput.rows = 3;
-    notesInput.maxLength = 2000;
-    notesInput.value = inquiry.internalNotes || "";
-    notesInput.placeholder = "Add private follow-up context, meeting notes, or next actions…";
-    notesInput.setAttribute("aria-label", "Internal notes for " + (inquiry.referenceId || inquiry.name));
-    notesLabel.appendChild(notesInput);
+    detailBody.append(contact, messageLabel);
+    if (isPartnershipAdmin()) {
+      const notesLabel = document.createElement("label");
+      notesLabel.className = "partnership-detail-field";
+      notesLabel.textContent = "Internal notes (admin only in this demo)";
+      const notesInput = document.createElement("textarea");
+      notesInput.className = "partnership-notes-input";
+      notesInput.rows = 3;
+      notesInput.maxLength = 2000;
+      notesInput.value = inquiry.internalNotes || "";
+      notesInput.placeholder = "Add private follow-up context, meeting notes, or next actions…";
+      notesInput.setAttribute("aria-label", "Internal notes for " + (inquiry.referenceId || inquiry.name));
+      notesLabel.appendChild(notesInput);
 
-    const followUpLabel = document.createElement("label");
-    followUpLabel.className = "partnership-detail-field";
-    followUpLabel.textContent = "Follow-up date";
-    const followUpInput = document.createElement("input");
-    followUpInput.type = "date";
-    followUpInput.className = "partnership-follow-up-input";
-    followUpInput.value = inquiry.followUpDate || "";
-    followUpInput.setAttribute("aria-label", "Follow-up date for " + (inquiry.referenceId || inquiry.name));
-    followUpLabel.appendChild(followUpInput);
+      const followUpLabel = document.createElement("label");
+      followUpLabel.className = "partnership-detail-field";
+      followUpLabel.textContent = "Follow-up date";
+      const followUpInput = document.createElement("input");
+      followUpInput.type = "date";
+      followUpInput.className = "partnership-follow-up-input";
+      followUpInput.value = inquiry.followUpDate || "";
+      followUpInput.setAttribute("aria-label", "Follow-up date for " + (inquiry.referenceId || inquiry.name));
+      followUpLabel.appendChild(followUpInput);
 
-    const detailActions = document.createElement("div");
-    detailActions.className = "partnership-detail-actions";
-    const saveDetailsButton = document.createElement("button");
-    saveDetailsButton.type = "button";
-    saveDetailsButton.className = "primary-button";
-    saveDetailsButton.textContent = "Save notes & follow-up";
-    const detailFeedback = document.createElement("span");
-    detailFeedback.className = "partnership-status-feedback";
-    detailFeedback.setAttribute("role", "status");
-    saveDetailsButton.addEventListener("click", () => {
-      const all = readPartnershipInquiries();
-      const target = all.find((item) => String(item.id) === String(inquiry.id) || item.referenceId === inquiry.referenceId);
-      if (!target) {
-        detailFeedback.textContent = "Inquiry not found. Refresh the dashboard.";
-        return;
-      }
-      target.internalNotes = notesInput.value.trim();
-      target.followUpDate = followUpInput.value;
-      target.updatedAt = Date.now();
-      if (savePartnershipInquiries(all)) {
-        detailFeedback.textContent = "Saved · " + new Date(target.updatedAt).toLocaleString();
-        showToast("Internal notes and follow-up date saved on this device.");
-        renderPartnershipDashboard();
-        renderHistory();
-      }
-    });
-    detailActions.append(saveDetailsButton, detailFeedback);
-    detailBody.append(contact, messageLabel, notesLabel, followUpLabel, detailActions);
+      const detailActions = document.createElement("div");
+      detailActions.className = "partnership-detail-actions";
+      const saveDetailsButton = document.createElement("button");
+      saveDetailsButton.type = "button";
+      saveDetailsButton.className = "primary-button";
+      saveDetailsButton.textContent = "Save admin notes & follow-up";
+      const detailFeedback = document.createElement("span");
+      detailFeedback.className = "partnership-status-feedback";
+      detailFeedback.setAttribute("role", "status");
+      saveDetailsButton.addEventListener("click", () => {
+        if (!isPartnershipAdmin()) { renderPartnershipDashboard(); return; }
+        const all = readPartnershipInquiries();
+        const target = all.find((item) => String(item.id) === String(inquiry.id) || item.referenceId === inquiry.referenceId);
+        if (!target) {
+          detailFeedback.textContent = "Inquiry not found. Refresh the dashboard.";
+          return;
+        }
+        target.internalNotes = notesInput.value.trim();
+        target.followUpDate = followUpInput.value;
+        target.updatedAt = Date.now();
+        if (savePartnershipInquiries(all)) {
+          detailFeedback.textContent = "Saved · " + new Date(target.updatedAt).toLocaleString();
+          showToast("Admin notes and follow-up date saved on this device.");
+          renderPartnershipDashboard();
+          renderHistory();
+        }
+      });
+      detailActions.append(saveDetailsButton, detailFeedback);
+      detailBody.append(notesLabel, followUpLabel, detailActions);
+    } else {
+      const adminOnlyNotice = document.createElement("p");
+      adminOnlyNotice.className = "partnership-admin-only-note";
+      adminOnlyNotice.textContent = "Internal notes and follow-up controls are available in admin mode only.";
+      detailBody.appendChild(adminOnlyNotice);
+    }
     details.append(detailsSummary, detailBody);
     if (inquiry.followUpDate) {
       const followUpBadge = document.createElement("p");
@@ -1606,7 +1663,10 @@ function exportPartnershipCsv() {
   showToast("Exported " + inquiries.length + " matching inquiry record(s) to CSV.");
 }
 
-document.querySelector("#partnership-export-csv").addEventListener("click", exportPartnershipCsv);
+document.querySelector("#partnership-export-csv").addEventListener("click", () => {
+  if (!isPartnershipAdmin()) { showToast("Only admins can export inquiry data."); return; }
+  exportPartnershipCsv();
+});
 
 [partnershipDashboardSearch, partnershipDashboardCategory, partnershipDashboardStatus].forEach((control) => {
   control.addEventListener("input", renderPartnershipDashboard);
@@ -1673,5 +1733,6 @@ document.querySelector("#new-partnership-inquiry").addEventListener("click", () 
 });
 
 // Initialize after every feature's state and event handlers have been declared.
+updatePartnershipAdminUI();
 renderPartnershipDashboard();
 restoreAuthSession();
