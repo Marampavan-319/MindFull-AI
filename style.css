@@ -128,3 +128,39 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--teal); outline-
 @media (prefers-reduced-motion: reduce) {
   *,*::before,*::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Main entry screen: users choose Guidance or Partnership first. */
+.nav-button { padding: 4px 0; border: 0; background: transparent; cursor: pointer; }
+.welcome-screen { min-height: calc(100vh - 150px); padding: 76px 9% 70px; display: flex; flex-direction: column; justify-content: center; background: radial-gradient(ellipse at 85% 12%, #e0e7ff 0%, transparent 38%), linear-gradient(135deg,#fff,#f5f7ff); }
+.welcome-copy { max-width: 760px; margin: 0 auto 38px; text-align: center; }
+.welcome-copy h1 { margin: 14px 0; color: var(--navy); font-size: clamp(36px,5vw,58px); line-height: 1.12; letter-spacing: -2px; }
+.welcome-copy h1 span { color: var(--indigo); }
+.welcome-copy p { max-width: 640px; margin: 0 auto; color: var(--muted); font-size: 16px; line-height: 1.9; }
+.choice-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 22px; max-width: 900px; width: 100%; margin: 0 auto; }
+.choice-card { display: flex; flex-direction: column; align-items: flex-start; min-height: 265px; padding: 30px; text-align: left; color: var(--text); background: rgba(255,255,255,.92); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); cursor: pointer; transition: transform .2s,border-color .2s,box-shadow .2s; }
+.choice-card:hover { transform: translateY(-5px); border-color: #a5b4fc; box-shadow: 0 18px 45px rgba(79,70,229,.12); }
+.choice-icon { width: 54px; height: 54px; display: grid; place-items: center; margin-bottom: 20px; color: var(--indigo); background: var(--soft-indigo); border-radius: 16px; font-size: 29px; font-weight: 700; }
+.partnership-choice .choice-icon,.partnership-symbol { color: #0f766e; background: #ccfbf1; }
+.choice-title { margin-bottom: 8px; color: var(--navy); font-size: 24px; font-weight: 800; }
+.choice-description { max-width: 370px; color: var(--muted); font-size: 14px; line-height: 1.8; }
+.choice-action { display: flex; align-items: center; gap: 12px; margin-top: auto; padding-top: 22px; color: var(--indigo); font-size: 14px; font-weight: 800; }
+.welcome-note { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 28px 0 0; color: var(--muted); font-size: 12px; }
+.welcome-note span { color: var(--teal); font-size: 18px; }
+.partnership-screen { min-height: calc(100vh - 150px); padding: 42px 9% 76px; background: linear-gradient(135deg,#fff,#f0fdfa); }
+.back-link { display: inline-block; margin-bottom: 28px; color: var(--indigo); font-size: 14px; font-weight: 700; }
+.partnership-panel { max-width: 760px; margin: 30px auto; padding: clamp(28px,5vw,54px); text-align: center; background: white; border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow); }
+.partnership-panel .choice-icon { margin: 0 auto 20px; }
+.partnership-panel h1 { margin: 14px 0; color: var(--navy); font-size: clamp(30px,4vw,44px); line-height: 1.2; letter-spacing: -1.4px; }
+.partnership-panel p { max-width: 580px; margin: 0 auto 25px; color: var(--muted); line-height: 1.9; }
+[hidden] { display: none !important; }
+@media (max-width: 700px) {
+  .header-nav { gap: 12px; }
+  .nav-button { font-size: 11px; }
+  .welcome-screen { min-height: auto; padding: 54px 6% 48px; }
+  .welcome-copy { margin-bottom: 28px; }
+  .welcome-copy h1 { font-size: clamp(35px,9vw,48px); letter-spacing: -1.4px; }
+  .welcome-copy p { font-size: 14px; }
+  .choice-grid { grid-template-columns: 1fr; gap: 15px; }
+  .choice-card { min-height: 230px; padding: 24px; }
+  .partnership-screen { padding: 30px 6% 55px; }
+}
