@@ -1241,8 +1241,17 @@ function restoreAppPage(page) {
 function restoreAuthSession() {
   try {
     const session = JSON.parse(localStorage.getItem(authSessionKey) || "null");
-    const lastPage = localStorage.getItem(pageStorageKey) || "home";
-    if (session && session.name && lastPage !== "auth") {
+    let lastPage = localStorage.getItem(pageStorageKey) || "home";
+
+    // A saved session takes priority over a stale "auth" page marker.
+    // The marker can remain after a previous sign-in gate or interrupted navigation.
+    if (session && session.name) {
+      if (lastPage === "auth") {
+        lastPage = localStorage.getItem(pageReturnStorageKey) || "home";
+        if (lastPage === "auth") lastPage = "home";
+      }
+      localStorage.setItem(pageStorageKey, lastPage);
+      localStorage.removeItem(pageReturnStorageKey);
       authScreen.hidden = true;
       signoutButton.hidden = false;
       signedInLabel.textContent = "Hi, " + session.name.split(" ")[0];
@@ -1250,9 +1259,14 @@ function restoreAuthSession() {
     } else {
       authScreen.hidden = false;
       signoutButton.hidden = true;
-      if (lastPage !== "auth") restoreAppPage(lastPage);
+      // Keep the intended destination for after the user signs in again.
+      if (lastPage !== "auth") {
+        localStorage.setItem(pageReturnStorageKey, lastPage);
+        localStorage.setItem(pageStorageKey, "auth");
+      }
     }
   } catch (error) {
+    // If browser storage is blocked or corrupted, keep sign-in available.
     authScreen.hidden = false;
     signoutButton.hidden = true;
   }
