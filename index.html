@@ -10,18 +10,43 @@
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="#" aria-label="MindFull Carrier home">
+    <a class="brand" href="#" data-view="home" aria-label="MindFull Carrier home">
       <span class="brand-mark">M</span>
       <span>MindFull <span class="brand-accent">Carrier</span></span>
     </a>
     <nav class="header-nav" aria-label="Main navigation">
-      <a class="nav-link active" href="#guidance">Guidance</a>
-      <a class="nav-link" href="#how-it-works">How it works</a>
+      <button class="nav-link nav-button active" type="button" data-view="home">Home</button>
+      <button class="nav-link nav-button" type="button" data-view="guidance">Guidance</button>
+      <button class="nav-link nav-button" type="button" data-view="partnership">Partnership</button>
     </nav>
     <span class="header-note"><span class="status-dot"></span>Your next step starts here</span>
   </header>
 
   <main>
+    <section class="welcome-screen" id="home-screen">
+      <div class="welcome-copy">
+        <span class="eyebrow">✦ YOUR FUTURE, YOUR WAY</span>
+        <h1>What would you like to <span>explore?</span></h1>
+        <p>Choose how MindFull Carrier can support your next step. You can start with personal career guidance or explore partnership opportunities.</p>
+      </div>
+      <div class="choice-grid">
+        <button class="choice-card guidance-choice" type="button" data-view="guidance">
+          <span class="choice-icon" aria-hidden="true">⌁</span>
+          <span class="choice-title">Guidance</span>
+          <span class="choice-description">Discover career paths, understand your interests, and find practical next steps for your future.</span>
+          <span class="choice-action">Explore guidance <span aria-hidden="true">→</span></span>
+        </button>
+        <button class="choice-card partnership-choice" type="button" data-view="partnership">
+          <span class="choice-icon" aria-hidden="true">✳</span>
+          <span class="choice-title">Partnership</span>
+          <span class="choice-description">Explore ways to collaborate with MindFull Carrier. Partnership features will be introduced in a later phase.</span>
+          <span class="choice-action">Explore partnership <span aria-hidden="true">→</span></span>
+        </button>
+      </div>
+      <p class="welcome-note"><span aria-hidden="true">♡</span> No pressure. Choose the path that fits what you need today.</p>
+    </section>
+
+    <div id="guidance-content" hidden>
     <section class="hero" id="guidance">
       <div class="hero-content">
         <span class="eyebrow">✦ YOUR FUTURE, YOUR WAY</span>
@@ -114,10 +139,22 @@
       <span class="bottom-note-icon" aria-hidden="true">✦</span>
       <div><h2>You don't need a perfect plan to get started.</h2><p>Every meaningful journey begins with one small, thoughtful step.</p></div>
     </section>
+    </div>
+
+    <section class="partnership-screen" id="partnership-screen" hidden>
+      <a class="back-link" href="#" data-view="home">← Back to choices</a>
+      <div class="partnership-panel">
+        <span class="choice-icon partnership-symbol" aria-hidden="true">✳</span>
+        <span class="eyebrow">LET'S BUILD SOMETHING MEANINGFUL</span>
+        <h1>Partnership opportunities are coming soon.</h1>
+        <p>We're focusing on building a useful career-guidance experience first. This space will later help mentors, organizations, and collaborators explore ways to work with MindFull Carrier.</p>
+        <button class="primary-button" type="button" data-view="home">Back to Guidance &amp; Partnership</button>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
-    <a class="brand footer-brand" href="#guidance"><span class="brand-mark">M</span><span>MindFull <span class="brand-accent">Carrier</span></span></a>
+    <a class="brand footer-brand" href="#" data-view="home"><span class="brand-mark">M</span><span>MindFull <span class="brand-accent">Carrier</span></span></a>
     <p>Explore your possibilities. Make your next step count.</p>
     <span>© <span id="current-year"></span> MindFull Carrier</span>
   </footer>
