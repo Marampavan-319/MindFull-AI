@@ -1471,14 +1471,33 @@ function savePartnershipInquiries(inquiries) {
   }
 }
 
+function normalizePartnershipSearchText(value) {
+  return String(value ?? "")
+    .normalize("NFKD")
+    .replace(/[\\u0300-\\u036f]/g, "")
+    .toLocaleLowerCase()
+    .trim();
+}
+
 function getFilteredPartnershipInquiries() {
-  const query = partnershipDashboardSearch.value.trim().toLowerCase();
-  const category = partnershipDashboardCategory.value;
-  const statusFilter = partnershipDashboardStatus.value;
+  // Normalize both the typed query and saved values so name searches are
+  // case-insensitive and tolerate extra spaces or accented characters.
+  const query = normalizePartnershipSearchText(partnershipDashboardSearch?.value || "");
+  const category = partnershipDashboardCategory?.value || "all";
+  const statusFilter = partnershipDashboardStatus?.value || "all";
+
   return readPartnershipInquiries()
     .sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0))
     .filter((item) => {
-      const searchable = [item.referenceId, item.name, item.email, item.organization, item.type, item.message, item.internalNotes].join(" ").toLowerCase();
+      const searchable = normalizePartnershipSearchText([
+        item.referenceId,
+        item.name,
+        item.email,
+        item.organization,
+        item.type,
+        item.message,
+        item.internalNotes
+      ].filter((value) => value !== null && value !== undefined).join(" "));
       return (!query || searchable.includes(query)) &&
         (category === "all" || item.type === category) &&
         (statusFilter === "all" || item.status === statusFilter);
@@ -1744,8 +1763,14 @@ document.querySelector("#partnership-export-csv").addEventListener("click", () =
   exportPartnershipCsv();
 });
 
-[partnershipDashboardSearch, partnershipDashboardCategory, partnershipDashboardStatus].forEach((control) => {
-  control.addEventListener("input", renderPartnershipDashboard);
+// Update search results immediately as the user types; keep select filters in sync too.
+if (partnershipDashboardSearch) {
+  partnershipDashboardSearch.addEventListener("input", renderPartnershipDashboard);
+  partnershipDashboardSearch.addEventListener("search", renderPartnershipDashboard);
+  partnershipDashboardSearch.addEventListener("change", renderPartnershipDashboard);
+}
+[partnershipDashboardCategory, partnershipDashboardStatus].forEach((control) => {
+  if (!control) return;
   control.addEventListener("change", renderPartnershipDashboard);
 });
 document.querySelector("#partnership-dashboard-refresh").addEventListener("click", () => {
