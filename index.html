@@ -229,14 +229,15 @@
           <div class="booking-actions"><button class="primary-button" type="submit">Confirm demo booking</button><button class="secondary-button" id="cancel-booking" type="button">Choose another mentor</button></div>
         </form>
         <section class="booking-confirmation" id="booking-confirmation" hidden aria-live="polite">
-          <span class="confirmation-check" aria-hidden="true">✓</span><h3>Demo request saved!</h3><p id="booking-confirmation-text"></p>
-          <p class="booking-disclaimer">This is a local prototype confirmation, not a real booking.</p>
-          <button class="secondary-button" id="new-booking" type="button">Make another request</button>
+          <span class="confirmation-check" aria-hidden="true">✓</span><h3 id="booking-confirmation-title">Complete your demo payment</h3><p id="booking-confirmation-text"></p>
+          <p class="payment-countdown" id="payment-countdown" aria-live="polite">You have 20:00 to complete payment.</p>
+          <p class="booking-disclaimer">Demo only: the button simulates payment. No money is charged. In a real product, payment must be verified securely by a payment provider.</p>
+          <div class="booking-actions"><button class="primary-button" id="complete-demo-payment" type="button">Complete demo payment</button><button class="secondary-button" id="new-booking" type="button">Make another request</button></div>
         </section>
       </section>
 
       <section class="saved-bookings" id="saved-bookings" hidden>
-        <div class="saved-bookings-heading"><h2>Your saved demo requests</h2><p>Stored in this browser on this device only.</p></div>
+        <div class="saved-bookings-heading"><h2>Paid session history</h2><p>Only demo requests marked as paid are kept here. Stored in this browser on this device only.</p></div>
         <div class="saved-bookings-list" id="saved-bookings-list"></div>
         <button class="text-button" id="clear-bookings" type="button">Clear saved demo requests</button>
       </section>
