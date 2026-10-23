@@ -913,4 +913,6 @@ document.querySelector("#clear-bookings").addEventListener("click", () => {
 
 // Clean up unpaid requests that expired while the page was closed; paid history remains.
 removeExpiredUnpaidBookings();
+// Keep expiry enforcement active even if the user closes the confirmation panel or starts another request.
+window.setInterval(removeExpiredUnpaidBookings, 1000);
 console.log("MindFull Carrier Step 3 loaded successfully.");
