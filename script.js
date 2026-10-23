@@ -762,14 +762,76 @@ function removeExpiredUnpaidBookings() {
   return bookings;
 }
 
+let activeHistoryType = "guidance";
+
+function setHistoryType(type) {
+  activeHistoryType = type === "partnership" ? "partnership" : "guidance";
+  const guidanceTab = document.querySelector("#history-guidance-tab");
+  const partnershipTab = document.querySelector("#history-partnership-tab");
+  guidanceTab.classList.toggle("active", activeHistoryType === "guidance");
+  partnershipTab.classList.toggle("active", activeHistoryType === "partnership");
+  guidanceTab.setAttribute("aria-selected", String(activeHistoryType === "guidance"));
+  partnershipTab.setAttribute("aria-selected", String(activeHistoryType === "partnership"));
+  document.querySelector("#history-description").textContent = activeHistoryType === "guidance"
+    ? "Mentor bookings and demo payment statuses"
+    : "Partnership collaboration inquiries saved in this browser";
+  document.querySelector("#history-find-mentor").hidden = activeHistoryType !== "guidance";
+  document.querySelector("#history-open-partnership").hidden = activeHistoryType !== "partnership";
+  renderHistory();
+}
+
 function renderHistory() {
   const list = document.querySelector("#history-list");
   const empty = document.querySelector("#history-empty");
   const count = document.querySelector("#history-count");
   if (!list || !empty || !count) return;
-  const bookings = removeExpiredUnpaidBookings().sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0));
   list.replaceChildren();
+
+  if (activeHistoryType === "partnership") {
+    let inquiries = [];
+    try {
+      const saved = JSON.parse(localStorage.getItem(partnershipInquiryStorageKey) || "[]");
+      inquiries = Array.isArray(saved) ? saved : [];
+    } catch (error) { inquiries = []; }
+    inquiries.sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0));
+    count.textContent = inquiries.length + (inquiries.length === 1 ? " inquiry" : " inquiries");
+    empty.textContent = "You don't have any partnership inquiries yet. Submit the Partnership form and your saved inquiry will appear here.";
+    empty.hidden = inquiries.length > 0;
+    inquiries.forEach((inquiry) => {
+      const item = document.createElement("article");
+      item.className = "history-item";
+      const top = document.createElement("div");
+      top.className = "history-item-top";
+      const title = document.createElement("h2");
+      title.textContent = inquiry.type || "Partnership inquiry";
+      const status = document.createElement("span");
+      status.className = "history-status history-status-pending";
+      status.textContent = "Saved locally · Not sent";
+      top.append(title, status);
+      const details = document.createElement("div");
+      details.className = "history-item-details";
+      const contact = document.createElement("p");
+      contact.textContent = "Contact: " + (inquiry.name || "Not provided") + (inquiry.email ? " · " + inquiry.email : "");
+      const organization = document.createElement("p");
+      organization.textContent = "Organization: " + (inquiry.organization || "Not provided");
+      const created = document.createElement("p");
+      created.textContent = "Inquiry saved: " + (inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleString() : "Previously saved");
+      const message = document.createElement("p");
+      message.className = "history-item-note history-item-message";
+      message.textContent = "Collaboration details: " + (inquiry.message || "No message provided");
+      const note = document.createElement("p");
+      note.className = "history-item-note";
+      note.textContent = "Prototype only: this inquiry is stored in this browser and has not been emailed or submitted to a server.";
+      details.append(contact, organization, created, message, note);
+      item.append(top, details);
+      list.appendChild(item);
+    });
+    return;
+  }
+
+  const bookings = removeExpiredUnpaidBookings().sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0));
   count.textContent = bookings.length + (bookings.length === 1 ? " request" : " requests");
+  empty.textContent = "You don't have any mentor requests yet. Once you submit a demo booking request, it will appear here—even if you don't complete payment.";
   empty.hidden = bookings.length > 0;
   bookings.forEach((booking) => {
     const item = document.createElement("article");
@@ -1031,11 +1093,14 @@ window.setInterval(removeExpiredUnpaidBookings, 1000);
 console.log("MindFull Carrier Step 3 loaded successfully.");
 
 
+document.querySelector("#history-guidance-tab").addEventListener("click", () => setHistoryType("guidance"));
+document.querySelector("#history-partnership-tab").addEventListener("click", () => setHistoryType("partnership"));
 document.querySelector("#history-refresh").addEventListener("click", () => {
   renderHistory();
   showToast("History refreshed.");
 });
 document.querySelector("#history-find-mentor").addEventListener("click", showMentors);
+document.querySelector("#history-open-partnership").addEventListener("click", () => showView("partnership"));
 /* Authentication MVP: browser-local demo accounts only, not production security. */
 const authScreen = document.querySelector("#auth-screen");
 const signinTab = document.querySelector("#signin-tab");
