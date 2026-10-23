@@ -394,3 +394,53 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--teal); outline-
   .history-toolbar { align-items: flex-start; flex-direction: column; }
   .history-item-top { flex-direction: column; }
 }
+
+
+/* Partnership page: collaborative, welcoming, and consistent with the navy/teal palette. */
+.partnership-screen { min-height: calc(100vh - 150px); padding: 34px 7% 76px; background: var(--background); }
+.partnership-hero { display:grid; grid-template-columns:1.1fr .9fr; align-items:center; gap:40px; max-width:1180px; margin:18px auto 56px; padding:clamp(28px,5vw,64px); background:linear-gradient(135deg,#fff,#e8f5f4); border:1px solid var(--border); border-radius:28px; overflow:hidden; }
+.partnership-hero-copy .eyebrow { color:var(--teal); }
+.partnership-hero-copy h1 { max-width:650px; margin:16px 0; color:var(--navy); font-size:clamp(36px,5vw,58px); line-height:1.08; letter-spacing:-1.8px; }
+.partnership-hero-copy h1 span { color:var(--teal); }
+.partnership-hero-copy > p:not(.partnership-prototype-note) { max-width:600px; margin:0 0 26px; color:var(--muted); line-height:1.85; }
+.partnership-prototype-note { margin:16px 0 0; color:var(--muted); font-size:12px; line-height:1.6; }
+.partnership-hero-art { min-height:300px; position:relative; display:grid; place-items:center; }
+.partner-orbit { position:absolute; width:250px; height:250px; border:1px solid rgba(22,166,160,.35); border-radius:50%; }
+.orbit-two { width:190px; height:190px; border-style:dashed; transform:rotate(30deg); }
+.partner-center { z-index:1; display:grid; place-items:center; width:112px; height:112px; border-radius:32px; color:#fff; background:var(--navy); box-shadow:0 18px 40px rgba(23,59,87,.2); font-size:44px; font-weight:800; position:relative; }
+.partner-center span { position:absolute; right:17px; top:12px; color:#72ddd2; font-size:18px; }
+.partner-node { position:absolute; z-index:2; display:grid; place-items:center; width:58px; height:58px; border:1px solid var(--border); border-radius:19px; background:#fff; box-shadow:var(--shadow); font-size:25px; }
+.node-one { top:14px; left:calc(50% - 29px); }.node-two { right:8px; top:calc(50% - 29px); }.node-three { bottom:14px; left:calc(50% - 29px); }.node-four { left:8px; top:calc(50% - 29px); }
+.partnership-section { max-width:1180px; margin:0 auto 60px; }
+.partnership-opportunity-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px; margin-top:26px; }
+.partnership-opportunity { display:flex; flex-direction:column; align-items:flex-start; padding:25px 22px; background:#fff; border:1px solid var(--border); border-radius:20px; box-shadow:var(--shadow); }
+.partnership-opportunity-icon { display:grid; place-items:center; width:48px; height:48px; border-radius:15px; background:var(--soft-teal); font-size:24px; }
+.partnership-opportunity h3,.partner-process-card h3 { margin:18px 0 9px; color:var(--navy); font-size:18px; }
+.partnership-opportunity p,.partner-process-card p { flex:1; margin:0 0 18px; color:var(--muted); font-size:14px; line-height:1.75; }
+.text-link { padding:0; border:0; background:transparent; color:var(--navy); font:inherit; font-size:13px; font-weight:750; cursor:pointer; text-align:left; }
+.text-link:hover { color:var(--teal); }
+.partnership-process-section { padding:35px; background:#fff; border:1px solid var(--border); border-radius:24px; }
+.partnership-process-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin-top:26px; }
+.partner-process-card { padding:10px 5px; }
+.partner-process-card > span { display:grid; place-items:center; width:42px; height:42px; border-radius:14px; color:var(--navy); background:var(--soft-indigo); font-weight:800; }
+.partner-process-card h3 { margin-top:14px; }
+.partnership-form-panel { display:grid; grid-template-columns:.8fr 1.2fr; gap:38px; max-width:1180px; margin:0 auto; padding:clamp(25px,4vw,48px); border:1px solid var(--border); border-radius:26px; background:#fff; box-shadow:var(--shadow); scroll-margin-top:100px; }
+.partnership-form-intro h2 { margin:13px 0; color:var(--navy); font-size:clamp(27px,3vw,38px); line-height:1.2; }
+.partnership-form-intro > p { color:var(--muted); line-height:1.8; }
+.partner-promise { display:flex; align-items:flex-start; gap:12px; margin-top:25px; padding:15px; background:var(--background); border-radius:14px; }
+.partner-promise > span { color:var(--teal); font-weight:900; }.partner-promise p { margin:0; color:var(--muted); font-size:13px; line-height:1.7; }
+.partnership-inquiry-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; }
+.partnership-inquiry-form label { display:flex; flex-direction:column; gap:8px; color:var(--text); font-size:13px; font-weight:700; }
+.partnership-inquiry-form input,.partnership-inquiry-form select,.partnership-inquiry-form textarea { width:100%; padding:13px 14px; border:1px solid var(--border); border-radius:12px; color:var(--text); background:#fff; font:inherit; font-size:14px; outline:none; }
+.partnership-inquiry-form input:focus,.partnership-inquiry-form select:focus,.partnership-inquiry-form textarea:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(22,166,160,.12); }
+.partnership-inquiry-form textarea { resize:vertical; }
+.partner-message-label,.partner-form-feedback,.partnership-inquiry-form > button { grid-column:1 / -1; }
+.optional-label { color:var(--muted); font-weight:400; }
+.partner-form-feedback { margin:0; color:#b42318; font-size:13px; }
+.partner-form-feedback.success { color:#087f70; }
+.partnership-success { align-self:start; padding:28px; border:1px solid #b8e8e1; border-radius:20px; background:#f1fbf9; }
+.partnership-success-mark { display:grid; place-items:center; width:45px; height:45px; border-radius:50%; background:var(--soft-teal); color:var(--navy); font-size:23px; font-weight:800; }
+.partnership-success h3 { color:var(--navy); font-size:24px; }
+.partnership-success p { color:var(--muted); line-height:1.7; }
+@media (max-width:1050px) { .partnership-opportunity-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .partnership-form-panel { grid-template-columns:1fr; } }
+@media (max-width:700px) { .partnership-screen { padding:24px 5% 48px; } .partnership-hero { grid-template-columns:1fr; gap:10px; padding:27px 23px; } .partnership-hero-art { min-height:245px; } .partner-orbit { width:210px; height:210px; } .orbit-two { width:160px; height:160px; } .partnership-opportunity-grid,.partnership-process-grid,.partnership-inquiry-form { grid-template-columns:1fr; } .partnership-process-section { padding:25px 22px; } .partnership-inquiry-form > * { grid-column:1; } }
