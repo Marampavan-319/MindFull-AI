@@ -224,3 +224,14 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--teal); outline-
   .career-chat { right: 12px; bottom: 12px; }
   .chat-toggle { padding: 12px 14px; }
 }
+
+
+/* Chatbot upgrade: suggested prompts and clearer interactive states */
+.chat-quick-prompts { display: flex; flex-wrap: wrap; gap: 7px; padding: 10px 12px 0; }
+.chat-prompt { padding: 7px 9px; color: var(--indigo-dark); background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 999px; font-size: 10px; font-weight: 700; cursor: pointer; transition: background .2s, border-color .2s, transform .2s; }
+.chat-prompt:hover { background: #e0e7ff; border-color: #a5b4fc; transform: translateY(-1px); }
+.chat-prompt:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.chat-prompt:active { transform: scale(.98); }
+.chat-bubble { animation: chat-bubble-in .16s ease-out; }
+@keyframes chat-bubble-in { from { opacity: .45; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .chat-bubble { animation: none; } }
