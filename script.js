@@ -908,8 +908,20 @@ function chooseMentor(mentorId) {
 function updateBookingPrice() {
   if (!bookingDuration || !bookingPrice) return;
   const prices = { 30: 299, 60: 499 };
-  bookingPrice.textContent = "₹" + (prices[Number(bookingDuration.value)] || prices[30]);
+  const selectedDuration = Number(bookingDuration.value) || 30;
+  bookingPrice.textContent = "₹" + (prices[selectedDuration] || prices[30]);
+  document.querySelectorAll(".duration-card[data-duration]").forEach((card) => {
+    const selected = Number(card.dataset.duration) === selectedDuration;
+    card.classList.toggle("selected", selected);
+    card.setAttribute("aria-pressed", String(selected));
+  });
 }
+document.querySelectorAll(".duration-card[data-duration]").forEach((card) => {
+  card.addEventListener("click", () => {
+    bookingDuration.value = card.dataset.duration;
+    updateBookingPrice();
+  });
+});
 bookingDuration.addEventListener("change", updateBookingPrice);
 updateBookingPrice();
 
