@@ -261,6 +261,14 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--teal); outline-
 .mentor-card h2 { margin: 12px 0 2px; color: var(--navy); font-size: 22px; }
 .mentor-specialty { margin: 0 0 12px !important; color: var(--indigo-dark) !important; font-weight: 700; font-size: 14px; }
 .mentor-card p { color: var(--muted); font-size: 14px; }
+.mentor-match-summary { margin: 0 0 14px; color: var(--navy); font-weight: 750; }
+.mentor-demo-notice { margin: 0 0 22px; padding: 14px 16px; color: #6b4c12; background: #fff8e7; border: 1px solid #f1d89b; border-radius: 12px; font-size: 13px; line-height: 1.6; }
+.mentor-detail { margin: 12px 0 8px; line-height: 1.55; }
+.mentor-detail strong { color: var(--text); }
+.mentor-detail-label { margin: 14px 0 6px !important; color: var(--navy) !important; font-weight: 800; }
+.mentor-skill-list { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 14px; padding: 0; list-style: none; }
+.mentor-skill-list li { padding: 6px 9px; color: #24556b; background: #edf5f7; border: 1px solid #d8e8ed; border-radius: 8px; font-size: 12px; line-height: 1.35; }
+.mentor-helps { padding-top: 10px; border-top: 1px solid var(--border); line-height: 1.55; }
 .mentor-select { margin-top: 10px; }
 .booking-panel { margin-top: 30px; padding: clamp(20px,4vw,34px); background: white; border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); }
 .booking-heading { margin-bottom: 22px; }
