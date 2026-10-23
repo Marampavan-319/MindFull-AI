@@ -650,4 +650,155 @@ document.querySelectorAll("[data-prompt]").forEach((button) => {
   button.addEventListener("click", () => sendChatQuestion(button.dataset.prompt));
 });
 
-console.log("MindFull Carrier Step 2 loaded successfully.");
+
+/* Step 3: mentor discovery, simulated session requests, and local persistence. */
+const mentorsScreen = document.querySelector("#mentors-screen");
+const bookingPanel = document.querySelector("#booking-panel");
+const bookingForm = document.querySelector("#booking-form");
+const bookingConfirmation = document.querySelector("#booking-confirmation");
+const bookingDate = document.querySelector("#booking-date");
+const bookingMentorSummary = document.querySelector("#booking-mentor-summary");
+const bookingConfirmationText = document.querySelector("#booking-confirmation-text");
+const savedBookingsSection = document.querySelector("#saved-bookings");
+const savedBookingsList = document.querySelector("#saved-bookings-list");
+const bookingStorageKey = "mindfullCarrier.demoMentorRequests";
+const mentorProfiles = {
+  alex: { name: "Alex Rivera", specialty: "Frontend and full-stack development" },
+  samira: { name: "Samira Khan", specialty: "Python, data analysis, and AI projects" },
+  jordan: { name: "Jordan Miles", specialty: "Resume, communication, and interviews" },
+  dev: { name: "Dev Patel", specialty: "Higher studies and research planning" }
+};
+let chosenMentorId = null;
+
+function showMentors() {
+  homeScreen.hidden = true;
+  guidanceContent.hidden = true;
+  assessmentScreen.hidden = true;
+  partnershipScreen.hidden = true;
+  mentorsScreen.hidden = false;
+  bookingPanel.hidden = true;
+  bookingForm.hidden = false;
+  bookingConfirmation.hidden = true;
+  renderSavedBookings();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function readSavedBookings() {
+  try {
+    const stored = localStorage.getItem(bookingStorageKey);
+    const parsed = stored ? JSON.parse(stored) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    showToast("Saved requests are unavailable in this browser session.");
+    return [];
+  }
+}
+
+function renderSavedBookings() {
+  const bookings = readSavedBookings();
+  savedBookingsList.replaceChildren();
+  savedBookingsSection.hidden = bookings.length === 0;
+  bookings.forEach((booking) => {
+    const item = document.createElement("article");
+    item.className = "saved-booking-item";
+    const title = document.createElement("h3");
+    title.textContent = booking.mentor + " · " + booking.duration + " minutes";
+    const date = document.createElement("p");
+    date.textContent = "Preferred time: " + booking.date + " at " + booking.time;
+    const goal = document.createElement("p");
+    goal.textContent = "Goal: " + booking.goal;
+    const status = document.createElement("p");
+    status.textContent = "Status: Simulated request saved locally";
+    item.append(title, date, goal, status);
+    savedBookingsList.appendChild(item);
+  });
+}
+
+function chooseMentor(mentorId) {
+  if (!mentorProfiles[mentorId]) return;
+  chosenMentorId = mentorId;
+  const mentor = mentorProfiles[mentorId];
+  bookingMentorSummary.textContent = mentor.name + " · " + mentor.specialty;
+  bookingPanel.hidden = false;
+  bookingForm.hidden = false;
+  bookingConfirmation.hidden = true;
+  bookingForm.reset();
+  const today = new Date();
+  const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  bookingDate.min = localToday;
+  bookingDate.value = localToday;
+  bookingPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.querySelector("#booking-name").focus({ preventScroll: true });
+}
+
+document.querySelector("#find-mentor").addEventListener("click", showMentors);
+document.querySelector("#back-to-guidance").addEventListener("click", () => {
+  mentorsScreen.hidden = true;
+  guidanceContent.hidden = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+document.querySelectorAll("[data-mentor]").forEach((button) => {
+  button.addEventListener("click", () => chooseMentor(button.dataset.mentor));
+});
+document.querySelector("#cancel-booking").addEventListener("click", () => {
+  bookingPanel.hidden = true;
+  chosenMentorId = null;
+  document.querySelector("#mentor-grid").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+document.querySelector("#new-booking").addEventListener("click", () => {
+  bookingConfirmation.hidden = true;
+  bookingForm.hidden = false;
+  bookingForm.reset();
+  chosenMentorId = null;
+  bookingPanel.hidden = true;
+  document.querySelector("#mentor-grid").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+bookingForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!chosenMentorId || !mentorProfiles[chosenMentorId]) {
+    showToast("Choose a mentor before saving a request.");
+    return;
+  }
+  if (!bookingForm.reportValidity()) return;
+  const mentor = mentorProfiles[chosenMentorId];
+  const booking = {
+    id: Date.now(),
+    mentor: mentor.name,
+    specialty: mentor.specialty,
+    name: document.querySelector("#booking-name").value.trim(),
+    email: document.querySelector("#booking-email").value.trim(),
+    duration: Number(document.querySelector("#booking-duration").value),
+    date: bookingDate.value,
+    time: document.querySelector("#booking-time").value,
+    goal: document.querySelector("#booking-goal").value.trim(),
+    status: "simulated"
+  };
+  if (!booking.name || !booking.email || !booking.goal || !booking.date || !booking.time) {
+    showToast("Please complete every field before saving.");
+    return;
+  }
+  const bookings = readSavedBookings();
+  bookings.unshift(booking);
+  try {
+    localStorage.setItem(bookingStorageKey, JSON.stringify(bookings.slice(0, 20)));
+  } catch (error) {
+    showToast("Your browser could not save this request. Check storage settings and try again.");
+    return;
+  }
+  bookingForm.hidden = true;
+  bookingConfirmation.hidden = false;
+  bookingConfirmationText.textContent = "A simulated " + booking.duration + "-minute request with " + booking.mentor + " for " + booking.date + " at " + booking.time + " has been saved in this browser. No real appointment has been made.";
+  renderSavedBookings();
+  bookingConfirmation.scrollIntoView({ behavior: "smooth", block: "nearest" });
+});
+document.querySelector("#clear-bookings").addEventListener("click", () => {
+  try {
+    localStorage.removeItem(bookingStorageKey);
+    renderSavedBookings();
+    showToast("Saved demo requests cleared.");
+  } catch (error) {
+    showToast("Could not clear saved requests in this browser.");
+  }
+});
+
+console.log("MindFull Carrier Step 3 loaded successfully.");
