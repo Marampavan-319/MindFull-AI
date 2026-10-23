@@ -1567,8 +1567,8 @@ function renderPartnershipDashboard() {
 
 function csvSafeCell(value) {
   let textValue = value === null || value === undefined ? "" : String(value);
-  // Prevent spreadsheet formula execution for values beginning with formula markers.
-  if (/^[\\s]*[=+@\\-]/.test(textValue)) textValue = "'" + textValue;
+  // Prefix formula-like cells to reduce spreadsheet formula-injection risk.
+  if (/^\\s*[=+@-]/.test(textValue)) textValue = "'" + textValue;
   return '"' + textValue.replace(/"/g, '""').replace(/\\r?\\n/g, " ") + '"';
 }
 
