@@ -11,6 +11,7 @@ const homeScreen = document.querySelector("#home-screen");
 const guidanceContent = document.querySelector("#guidance-content");
 const partnershipScreen = document.querySelector("#partnership-screen");
 const assessmentScreen = document.querySelector("#assessment-screen");
+const historyScreen = document.querySelector("#history-screen");
 const viewButtons = document.querySelectorAll("[data-view]");
 const navButtons = document.querySelectorAll(".header-nav [data-view]");
 const assessmentTitle = document.querySelector("#assessment-title");
@@ -141,7 +142,9 @@ function showView(view) {
   partnershipScreen.hidden = view !== "partnership";
   assessmentScreen.hidden = true;
   mentorsScreen.hidden = true;
+  historyScreen.hidden = view !== "history";
   navButtons.forEach((button) => button.classList.toggle("active", button.dataset.view === view));
+  if (view === "history") renderHistory();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -704,12 +707,25 @@ const mentorProfiles = {
 };
 let chosenMentorId = null;
 
+function showHistory() {
+  saveCurrentPage("history");
+  homeScreen.hidden = true;
+  guidanceContent.hidden = true;
+  assessmentScreen.hidden = true;
+  partnershipScreen.hidden = true;
+  mentorsScreen.hidden = true;
+  historyScreen.hidden = false;
+  renderHistory();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 function showMentors() {
   saveCurrentPage("mentors");
   homeScreen.hidden = true;
   guidanceContent.hidden = true;
   assessmentScreen.hidden = true;
   partnershipScreen.hidden = true;
+  historyScreen.hidden = true;
   mentorsScreen.hidden = false;
   bookingPanel.hidden = true;
   bookingForm.hidden = false;
@@ -732,11 +748,60 @@ function readSavedBookings() {
 function removeExpiredUnpaidBookings() {
   const now = Date.now();
   const bookings = readSavedBookings();
-  const active = bookings.filter((booking) => booking.status === "paid" || (booking.status === "pending" && Number(booking.expiresAt) > now));
-  if (active.length !== bookings.length) {
-    try { localStorage.setItem(bookingStorageKey, JSON.stringify(active)); } catch (error) { /* Leave cleanup for the next visit if storage is unavailable. */ }
+  let changed = false;
+  bookings.forEach((booking) => {
+    if (booking.status === "pending" && Number(booking.expiresAt) <= now) {
+      booking.status = "expired";
+      booking.expiredAt = now;
+      changed = true;
+    }
+  });
+  if (changed) {
+    try { localStorage.setItem(bookingStorageKey, JSON.stringify(bookings)); } catch (error) { /* Recheck expiry on the next visit if storage is unavailable. */ }
   }
-  return active;
+  return bookings;
+}
+
+function renderHistory() {
+  const list = document.querySelector("#history-list");
+  const empty = document.querySelector("#history-empty");
+  const count = document.querySelector("#history-count");
+  if (!list || !empty || !count) return;
+  const bookings = removeExpiredUnpaidBookings().sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0));
+  list.replaceChildren();
+  count.textContent = bookings.length + (bookings.length === 1 ? " request" : " requests");
+  empty.hidden = bookings.length > 0;
+  bookings.forEach((booking) => {
+    const item = document.createElement("article");
+    item.className = "history-item";
+    const top = document.createElement("div");
+    top.className = "history-item-top";
+    const title = document.createElement("h2");
+    title.textContent = (booking.mentor || "Mentor request") + " · " + (booking.duration || "—") + " minutes";
+    const status = document.createElement("span");
+    const state = booking.status === "paid" ? "paid" : booking.status === "pending" ? "pending" : "expired";
+    status.className = "history-status history-status-" + state;
+    status.textContent = state === "paid" ? "Demo payment completed" : state === "pending" ? "Payment pending" : "Payment window expired";
+    top.append(title, status);
+    const details = document.createElement("div");
+    details.className = "history-item-details";
+    const fee = document.createElement("p");
+    fee.textContent = "Demo fee: ₹" + (booking.price || 0) + " · " + (booking.date || "Date not set") + (booking.time ? " at " + booking.time : "");
+    const goal = document.createElement("p");
+    goal.textContent = "Goal: " + (booking.goal || "Not provided");
+    const created = document.createElement("p");
+    created.textContent = "Request saved: " + (booking.createdAt ? new Date(booking.createdAt).toLocaleString() : "Previously saved");
+    const note = document.createElement("p");
+    note.className = "history-item-note";
+    note.textContent = state === "paid"
+      ? "Demo only: no real money was charged and no appointment was booked."
+      : state === "pending"
+        ? "Finish the demo payment before the countdown ends. Unpaid requests become expired and remain visible here."
+        : "No demo payment was completed before the deadline. This request is kept in your history.";
+    details.append(fee, goal, created, note);
+    item.append(top, details);
+    list.appendChild(item);
+  });
 }
 
 function renderSavedBookings() {
@@ -863,18 +928,24 @@ function findPendingBooking(id) {
 }
 
 function expirePendingBooking(id) {
-  const remaining = readSavedBookings().filter((booking) => !(booking.id === id && booking.status === "pending"));
+  const remaining = readSavedBookings();
+  const expired = remaining.find((booking) => booking.id === id && booking.status === "pending");
+  if (expired) {
+    expired.status = "expired";
+    expired.expiredAt = Date.now();
+  }
   try { localStorage.setItem(bookingStorageKey, JSON.stringify(remaining)); } catch (error) { /* The expiry is checked again when the page next loads. */ }
   if (paymentCountdownInterval) window.clearInterval(paymentCountdownInterval);
   paymentCountdownInterval = null;
   activePendingBookingId = null;
-  paymentCountdown.textContent = "Time expired. This unpaid request has been removed and will not appear in history.";
+  paymentCountdown.textContent = "Time expired. This unpaid request is now marked expired in your history.";
   paymentCountdown.classList.remove("is-paid");
   paymentCountdown.classList.add("is-expired");
   bookingConfirmationTitle.textContent = "Payment window expired";
-  bookingConfirmationText.textContent = "The 20-minute window ended before the demo payment was completed. The request has been removed.";
+  bookingConfirmationText.textContent = "The 20-minute window ended before the demo payment was completed. The request remains in your history as expired.";
   completeDemoPaymentButton.hidden = true;
   renderSavedBookings();
+  renderHistory();
 }
 
 function startPaymentCountdown(id) {
@@ -950,24 +1021,44 @@ completeDemoPaymentButton.addEventListener("click", () => {
   bookingConfirmationText.textContent = "Your simulated payment of ₹" + booking.price + " is marked complete. No real money was charged and no real appointment was booked.";
   completeDemoPaymentButton.hidden = true;
   renderSavedBookings();
+  renderHistory();
 });
 
 document.querySelector("#clear-bookings").addEventListener("click", () => {
   try {
     localStorage.removeItem(bookingStorageKey);
     renderSavedBookings();
+    renderHistory();
     showToast("Saved demo requests cleared.");
   } catch (error) {
     showToast("Could not clear saved requests in this browser.");
   }
 });
 
-// Clean up unpaid requests that expired while the page was closed; paid history remains.
+// Mark unpaid requests as expired when their payment window ends; keep them in history.
 removeExpiredUnpaidBookings();
 // Keep expiry enforcement active even if the user closes the confirmation panel or starts another request.
 window.setInterval(removeExpiredUnpaidBookings, 1000);
 console.log("MindFull Carrier Step 3 loaded successfully.");
 
+
+document.querySelector("#history-refresh").addEventListener("click", () => {
+  renderHistory();
+  showToast("History refreshed.");
+});
+document.querySelector("#history-find-mentor").addEventListener("click", showMentors);
+document.querySelector("#history-clear").addEventListener("click", () => {
+  const confirmed = window.confirm("Clear all mentor request history saved in this browser? This cannot be undone.");
+  if (!confirmed) return;
+  try {
+    localStorage.removeItem(bookingStorageKey);
+    renderHistory();
+    renderSavedBookings();
+    showToast("History cleared from this device.");
+  } catch (error) {
+    showToast("Could not clear history in this browser.");
+  }
+});
 
 /* Authentication MVP: browser-local demo accounts only, not production security. */
 const authScreen = document.querySelector("#auth-screen");
@@ -1055,6 +1146,7 @@ function restoreAppPage(page) {
   partnershipScreen.hidden = true;
   assessmentScreen.hidden = true;
   mentorsScreen.hidden = true;
+  historyScreen.hidden = true;
 
   if (page === "home" || !page) {
     showView("home");
@@ -1066,6 +1158,10 @@ function restoreAppPage(page) {
   }
   if (page === "mentors") {
     showMentors();
+    return;
+  }
+  if (page === "history") {
+    showHistory();
     return;
   }
   if (page === "assessment") {
