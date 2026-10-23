@@ -904,10 +904,10 @@ bookingForm.addEventListener("submit", (event) => {
   booking.createdAt = Date.now();
   booking.expiresAt = booking.createdAt + 20 * 60 * 1000;
   booking.status = "pending";
-  const bookings = readSavedBookings().filter((saved) => saved.status === "paid");
+  const bookings = readSavedBookings();
   bookings.unshift(booking);
   try {
-    localStorage.setItem(bookingStorageKey, JSON.stringify(bookings.slice(0, 20)));
+    localStorage.setItem(bookingStorageKey, JSON.stringify(bookings.slice(0, 100)));
   } catch (error) {
     showToast("Your browser could not save this request. Check storage settings and try again.");
     return;
@@ -1024,17 +1024,6 @@ completeDemoPaymentButton.addEventListener("click", () => {
   renderHistory();
 });
 
-document.querySelector("#clear-bookings").addEventListener("click", () => {
-  try {
-    localStorage.removeItem(bookingStorageKey);
-    renderSavedBookings();
-    renderHistory();
-    showToast("Saved demo requests cleared.");
-  } catch (error) {
-    showToast("Could not clear saved requests in this browser.");
-  }
-});
-
 // Mark unpaid requests as expired when their payment window ends; keep them in history.
 removeExpiredUnpaidBookings();
 // Keep expiry enforcement active even if the user closes the confirmation panel or starts another request.
@@ -1047,19 +1036,6 @@ document.querySelector("#history-refresh").addEventListener("click", () => {
   showToast("History refreshed.");
 });
 document.querySelector("#history-find-mentor").addEventListener("click", showMentors);
-document.querySelector("#history-clear").addEventListener("click", () => {
-  const confirmed = window.confirm("Clear all mentor request history saved in this browser? This cannot be undone.");
-  if (!confirmed) return;
-  try {
-    localStorage.removeItem(bookingStorageKey);
-    renderHistory();
-    renderSavedBookings();
-    showToast("History cleared from this device.");
-  } catch (error) {
-    showToast("Could not clear history in this browser.");
-  }
-});
-
 /* Authentication MVP: browser-local demo accounts only, not production security. */
 const authScreen = document.querySelector("#auth-screen");
 const signinTab = document.querySelector("#signin-tab");
