@@ -556,9 +556,8 @@ function getFollowUpReply(text) {
   }
 
   if (reply) {
-    if (!["roadmap-goal", "skill-focus", "internship-role", "project-area", "career-interest", "study-field", "exam-target", "business-idea", "target-role", "skill-level", "interview-mode"].includes(pendingChatFollowUp)) {
-      pendingChatFollowUp = null;
-    }
+    // Keep a newly requested follow-up; otherwise clear the completed one.
+    if (pendingChatFollowUp === pending) pendingChatFollowUp = null;
     return reply;
   }
 
