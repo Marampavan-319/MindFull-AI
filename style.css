@@ -444,3 +444,11 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--teal); outline-
 .partnership-success p { color:var(--muted); line-height:1.7; }
 @media (max-width:1050px) { .partnership-opportunity-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .partnership-form-panel { grid-template-columns:1fr; } }
 @media (max-width:700px) { .partnership-screen { padding:24px 5% 48px; } .partnership-hero { grid-template-columns:1fr; gap:10px; padding:27px 23px; } .partnership-hero-art { min-height:245px; } .partner-orbit { width:210px; height:210px; } .orbit-two { width:160px; height:160px; } .partnership-opportunity-grid,.partnership-process-grid,.partnership-inquiry-form { grid-template-columns:1fr; } .partnership-process-section { padding:25px 22px; } .partnership-inquiry-form > * { grid-column:1; } }
+
+/* Separate history tabs for Guidance and Partnership records. */
+.history-tabs { display: flex; gap: 10px; margin: 24px 0 18px; padding: 6px; background: #EAF0F5; border-radius: 14px; }
+.history-tab { flex: 1; border: 1px solid transparent; border-radius: 10px; padding: 13px 16px; background: transparent; color: var(--muted); font: inherit; font-weight: 800; cursor: pointer; transition: background .2s ease, color .2s ease, box-shadow .2s ease; }
+.history-tab.active { background: var(--surface); color: var(--navy); border-color: var(--border); box-shadow: 0 4px 12px rgba(23,59,87,.08); }
+.history-tab:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+.history-item-message { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .history-tabs { flex-direction: column; } .history-tab { width: 100%; } }
