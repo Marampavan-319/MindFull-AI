@@ -658,6 +658,8 @@ const bookingPanel = document.querySelector("#booking-panel");
 const bookingForm = document.querySelector("#booking-form");
 const bookingConfirmation = document.querySelector("#booking-confirmation");
 const bookingDate = document.querySelector("#booking-date");
+const bookingDuration = document.querySelector("#booking-duration");
+const bookingPrice = document.querySelector("#booking-price");
 const bookingMentorSummary = document.querySelector("#booking-mentor-summary");
 const bookingConfirmationText = document.querySelector("#booking-confirmation-text");
 const savedBookingsSection = document.querySelector("#saved-bookings");
@@ -703,13 +705,13 @@ function renderSavedBookings() {
     const item = document.createElement("article");
     item.className = "saved-booking-item";
     const title = document.createElement("h3");
-    title.textContent = booking.mentor + " · " + booking.duration + " minutes";
+    title.textContent = booking.mentor + " · " + booking.duration + " minutes · ₹" + booking.price;
     const date = document.createElement("p");
     date.textContent = "Preferred time: " + booking.date + " at " + booking.time;
     const goal = document.createElement("p");
     goal.textContent = "Goal: " + booking.goal;
     const status = document.createElement("p");
-    status.textContent = "Status: Simulated request saved locally";
+    status.textContent = "Status: Demo only · No payment taken";
     item.append(title, date, goal, status);
     savedBookingsList.appendChild(item);
   });
@@ -724,6 +726,7 @@ function chooseMentor(mentorId) {
   bookingForm.hidden = false;
   bookingConfirmation.hidden = true;
   bookingForm.reset();
+  updateBookingPrice();
   const today = new Date();
   const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   bookingDate.min = localToday;
@@ -731,6 +734,14 @@ function chooseMentor(mentorId) {
   bookingPanel.scrollIntoView({ behavior: "smooth", block: "start" });
   document.querySelector("#booking-name").focus({ preventScroll: true });
 }
+
+function updateBookingPrice() {
+  if (!bookingDuration || !bookingPrice) return;
+  const prices = { 30: 299, 60: 499 };
+  bookingPrice.textContent = "₹" + (prices[Number(bookingDuration.value)] || prices[30]);
+}
+bookingDuration.addEventListener("change", updateBookingPrice);
+updateBookingPrice();
 
 document.querySelector("#find-mentor").addEventListener("click", showMentors);
 document.querySelector("#back-to-guidance").addEventListener("click", () => {
@@ -769,6 +780,7 @@ bookingForm.addEventListener("submit", (event) => {
     name: document.querySelector("#booking-name").value.trim(),
     email: document.querySelector("#booking-email").value.trim(),
     duration: Number(document.querySelector("#booking-duration").value),
+    price: Number(document.querySelector("#booking-duration").value) === 60 ? 499 : 299,
     date: bookingDate.value,
     time: document.querySelector("#booking-time").value,
     goal: document.querySelector("#booking-goal").value.trim(),
@@ -788,7 +800,7 @@ bookingForm.addEventListener("submit", (event) => {
   }
   bookingForm.hidden = true;
   bookingConfirmation.hidden = false;
-  bookingConfirmationText.textContent = "A simulated " + booking.duration + "-minute request with " + booking.mentor + " for " + booking.date + " at " + booking.time + " has been saved in this browser. No real appointment has been made.";
+  bookingConfirmationText.textContent = "Your demo booking with " + booking.mentor + " is recorded for " + booking.date + " at " + booking.time + ". Session fee shown: ₹" + booking.price + ". No payment was taken and no real appointment has been made.";
   renderSavedBookings();
   bookingConfirmation.scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
