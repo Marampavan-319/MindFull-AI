@@ -171,11 +171,74 @@
           <div id="recommendation-list" class="recommendation-list"></div>
           <p class="results-disclaimer">These suggestions are based on your answers, not a scientific or definitive assessment. Use them as a starting point and adjust them to your circumstances.</p>
           <div class="results-actions">
-            <button class="primary-button" type="button" id="retake-assessment">Retake assessment</button>
+            <button class="primary-button" type="button" id="find-mentor">Find a mentor</button>
+            <button class="secondary-button" type="button" id="retake-assessment">Retake assessment</button>
             <button class="secondary-button" type="button" id="change-path">Explore another path</button>
           </div>
         </section>
       </div>
+    </section>
+
+    <section class="mentors-screen" id="mentors-screen" hidden>
+      <button class="back-link" type="button" id="back-to-guidance">← Back to guidance</button>
+      <div class="mentors-heading">
+        <span class="eyebrow">LEARN WITH SUPPORT</span>
+        <h1>Find a mentor for your next step.</h1>
+        <p>Explore demo mentor profiles and choose a session length. This is a prototype: mentors, time slots, and bookings are simulated, not real appointments.</p>
+      </div>
+      <div class="mentor-grid" id="mentor-grid">
+        <article class="mentor-card">
+          <div class="mentor-avatar" aria-hidden="true">AR</div><span class="mentor-tag">Web &amp; software</span>
+          <h2>Alex Rivera</h2><p class="mentor-specialty">Frontend and full-stack development</p>
+          <p>Get help planning a portfolio, understanding web fundamentals, and preparing for junior developer interviews.</p>
+          <button class="primary-button mentor-select" type="button" data-mentor="alex">Choose mentor</button>
+        </article>
+        <article class="mentor-card">
+          <div class="mentor-avatar mentor-avatar-teal" aria-hidden="true">SK</div><span class="mentor-tag">Data &amp; AI</span>
+          <h2>Samira Khan</h2><p class="mentor-specialty">Python, data analysis, and AI projects</p>
+          <p>Turn a learning goal into a manageable project and practise explaining technical decisions clearly.</p>
+          <button class="primary-button mentor-select" type="button" data-mentor="samira">Choose mentor</button>
+        </article>
+        <article class="mentor-card">
+          <div class="mentor-avatar mentor-avatar-amber" aria-hidden="true">JM</div><span class="mentor-tag">Career readiness</span>
+          <h2>Jordan Miles</h2><p class="mentor-specialty">Resume, communication, and interviews</p>
+          <p>Organize your experience, improve project stories, and build a practical preparation routine.</p>
+          <button class="primary-button mentor-select" type="button" data-mentor="jordan">Choose mentor</button>
+        </article>
+        <article class="mentor-card">
+          <div class="mentor-avatar mentor-avatar-rose" aria-hidden="true">DP</div><span class="mentor-tag">Study &amp; research</span>
+          <h2>Dev Patel</h2><p class="mentor-specialty">Higher studies and research planning</p>
+          <p>Compare study options, map prerequisites, and create a checklist for researching programs.</p>
+          <button class="primary-button mentor-select" type="button" data-mentor="dev">Choose mentor</button>
+        </article>
+      </div>
+
+      <section class="booking-panel" id="booking-panel" hidden>
+        <div class="booking-heading"><span class="eyebrow">SESSION REQUEST</span><h2>Plan your mentoring session</h2><p id="booking-mentor-summary">Choose a demo mentor to continue.</p></div>
+        <form id="booking-form" class="booking-form">
+          <div class="booking-fields">
+            <label>Full name<input id="booking-name" name="name" type="text" autocomplete="name" maxlength="80" required placeholder="Your name"></label>
+            <label>Email address<input id="booking-email" name="email" type="email" autocomplete="email" maxlength="120" required placeholder="you@example.com"></label>
+            <label>Session length<select id="booking-duration" name="duration" required><option value="30">30 minutes</option><option value="60">60 minutes</option></select></label>
+            <label>Preferred date<input id="booking-date" name="date" type="date" required></label>
+            <label>Preferred time<select id="booking-time" name="time" required><option value="">Choose a time</option><option>10:00 AM</option><option>12:00 PM</option><option>2:00 PM</option><option>4:00 PM</option><option>6:00 PM</option></select></label>
+            <label class="booking-goal">What would you like help with?<textarea id="booking-goal" name="goal" rows="3" maxlength="500" required placeholder="Share your goal or question"></textarea></label>
+          </div>
+          <p class="booking-disclaimer">Demo only: submitting saves a simulated request in this browser. It does not contact a mentor or reserve a real calendar slot.</p>
+          <div class="booking-actions"><button class="primary-button" type="submit">Save demo request</button><button class="secondary-button" id="cancel-booking" type="button">Choose another mentor</button></div>
+        </form>
+        <section class="booking-confirmation" id="booking-confirmation" hidden aria-live="polite">
+          <span class="confirmation-check" aria-hidden="true">✓</span><h3>Demo request saved!</h3><p id="booking-confirmation-text"></p>
+          <p class="booking-disclaimer">This is a local prototype confirmation, not a real booking.</p>
+          <button class="secondary-button" id="new-booking" type="button">Make another request</button>
+        </section>
+      </section>
+
+      <section class="saved-bookings" id="saved-bookings" hidden>
+        <div class="saved-bookings-heading"><h2>Your saved demo requests</h2><p>Stored in this browser on this device only.</p></div>
+        <div class="saved-bookings-list" id="saved-bookings-list"></div>
+        <button class="text-button" id="clear-bookings" type="button">Clear saved demo requests</button>
+      </section>
     </section>
 
     <section class="career-chat" id="career-chat" aria-label="Career guidance chatbot">
