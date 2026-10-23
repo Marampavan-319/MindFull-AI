@@ -121,6 +121,7 @@ function showView(view) {
   guidanceContent.hidden = view !== "guidance";
   partnershipScreen.hidden = view !== "partnership";
   assessmentScreen.hidden = true;
+  mentorsScreen.hidden = true;
   navButtons.forEach((button) => button.classList.toggle("active", button.dataset.view === view));
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
