@@ -372,6 +372,26 @@
           <article class="partner-process-card"><span>03</span><h3>Plan a small pilot</h3><p>Outline a manageable first step, then learn and improve together.</p></article>
         </div>
       </section>
+      <section class="partnership-dashboard-section" id="partnership-dashboard">
+        <div class="section-heading partnership-dashboard-heading">
+          <div><span class="eyebrow">PARTNERSHIP WORKSPACE</span><h2>Inquiry dashboard.</h2><p>Review demo inquiries from all four partnership groups and update their local tracking status.</p></div>
+          <button class="secondary-button" id="partnership-dashboard-refresh" type="button">Refresh dashboard</button>
+        </div>
+        <div class="partnership-stats-grid" aria-label="Inquiry summary">
+          <article class="partnership-stat-card"><span>Total inquiries</span><strong id="partner-stat-total">0</strong><small>Saved in this browser</small></article>
+          <article class="partnership-stat-card"><span>New</span><strong id="partner-stat-new">0</strong><small>Awaiting review</small></article>
+          <article class="partnership-stat-card"><span>In progress</span><strong id="partner-stat-progress">0</strong><small>Reviewing or contacted</small></article>
+          <article class="partnership-stat-card"><span>Closed</span><strong id="partner-stat-closed">0</strong><small>Marked complete</small></article>
+        </div>
+        <div class="partnership-dashboard-tools">
+          <label for="partner-dashboard-search">Search inquiries<input id="partner-dashboard-search" type="search" placeholder="Search name, organization, or reference ID"></label>
+          <label for="partner-dashboard-category">Partnership category<select id="partner-dashboard-category"><option value="all">All categories</option><option>College or university</option><option>Mentor or professional</option><option>Company or recruiter</option><option>Community or organization</option><option>Other collaboration</option></select></label>
+          <label for="partner-dashboard-status">Tracking status<select id="partner-dashboard-status"><option value="all">All statuses</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="contacted">Contacted</option><option value="closed">Closed</option></select></label>
+        </div>
+        <p class="partnership-dashboard-notice">Prototype dashboard: statuses and inquiries are stored in this browser only. Updating a status does not contact the partner or notify a team.</p>
+        <div id="partnership-dashboard-list" class="partnership-dashboard-list" aria-live="polite"></div>
+        <p id="partnership-dashboard-empty" class="partnership-dashboard-empty" hidden>No inquiries match these filters yet. Submit a demo inquiry below to see it here.</p>
+      </section>
       <section class="partnership-form-panel" id="partnership-form">
         <div class="partnership-form-intro"><span class="eyebrow">START A CONVERSATION</span><h2>Tell us how you'd like to partner.</h2><p>Share a few details so the idea is easy to understand. This prototype stores your inquiry locally for demonstration.</p><div class="partner-promise"><span>✓</span><p>No commitment required. This form does not create a formal agreement or send your details anywhere.</p></div></div>
         <form id="partnership-inquiry-form" class="partnership-inquiry-form">
