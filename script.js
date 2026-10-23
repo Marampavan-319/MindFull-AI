@@ -1395,6 +1395,20 @@ function savePartnershipInquiries(inquiries) {
   }
 }
 
+function getFilteredPartnershipInquiries() {
+  const query = partnershipDashboardSearch.value.trim().toLowerCase();
+  const category = partnershipDashboardCategory.value;
+  const statusFilter = partnershipDashboardStatus.value;
+  return readPartnershipInquiries()
+    .sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0))
+    .filter((item) => {
+      const searchable = [item.referenceId, item.name, item.email, item.organization, item.type, item.message, item.internalNotes].join(" ").toLowerCase();
+      return (!query || searchable.includes(query)) &&
+        (category === "all" || item.type === category) &&
+        (statusFilter === "all" || item.status === statusFilter);
+    });
+}
+
 function renderPartnershipDashboard() {
   if (!partnershipDashboardList) return;
   const inquiries = readPartnershipInquiries().sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0));
@@ -1402,15 +1416,7 @@ function renderPartnershipDashboard() {
   document.querySelector("#partner-stat-new").textContent = String(inquiries.filter((item) => item.status === "new").length);
   document.querySelector("#partner-stat-progress").textContent = String(inquiries.filter((item) => item.status === "reviewing" || item.status === "contacted").length);
   document.querySelector("#partner-stat-closed").textContent = String(inquiries.filter((item) => item.status === "closed").length);
-  const query = partnershipDashboardSearch.value.trim().toLowerCase();
-  const category = partnershipDashboardCategory.value;
-  const statusFilter = partnershipDashboardStatus.value;
-  const visible = inquiries.filter((item) => {
-    const searchable = [item.referenceId, item.name, item.email, item.organization, item.type, item.message].join(" ").toLowerCase();
-    return (!query || searchable.includes(query)) &&
-      (category === "all" || item.type === category) &&
-      (statusFilter === "all" || item.status === statusFilter);
-  });
+  const visible = getFilteredPartnershipInquiries();
   partnershipDashboardList.replaceChildren();
   partnershipDashboardEmpty.hidden = visible.length > 0;
   partnershipDashboardEmpty.textContent = inquiries.length === 0
@@ -1464,16 +1470,143 @@ function renderPartnershipDashboard() {
     });
     statusLabel.appendChild(statusSelect);
     statusRow.append(statusLabel, statusFeedback);
-    const message = document.createElement("p");
-    message.className = "partnership-inquiry-message";
-    message.textContent = inquiry.message || "No collaboration details provided.";
     const date = document.createElement("p");
     date.className = "partnership-inquiry-meta";
     date.textContent = "Submitted: " + (inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleString() : "Date not recorded");
-    card.append(top, statusRow, message, date);
+
+    const details = document.createElement("details");
+    details.className = "partnership-inquiry-details";
+    const detailsSummary = document.createElement("summary");
+    detailsSummary.textContent = "Inquiry details, internal notes & follow-up";
+    const detailBody = document.createElement("div");
+    detailBody.className = "partnership-detail-body";
+
+    const contact = document.createElement("div");
+    contact.className = "partnership-detail-contact";
+    const emailLabel = document.createElement("span");
+    emailLabel.textContent = "Contact email";
+    const emailLink = document.createElement("a");
+    emailLink.href = "mailto:" + String(inquiry.email || "").replace(/[\\r\\n]/g, "");
+    emailLink.textContent = inquiry.email || "Email not provided";
+    if (!inquiry.email) emailLink.removeAttribute("href");
+    contact.append(emailLabel, emailLink);
+
+    const messageLabel = document.createElement("label");
+    messageLabel.className = "partnership-detail-field";
+    messageLabel.textContent = "Full collaboration message";
+    const fullMessage = document.createElement("p");
+    fullMessage.className = "partnership-inquiry-message";
+    fullMessage.textContent = inquiry.message || "No collaboration details provided.";
+    messageLabel.appendChild(fullMessage);
+
+    const notesLabel = document.createElement("label");
+    notesLabel.className = "partnership-detail-field";
+    notesLabel.textContent = "Internal notes (saved only on this device)";
+    const notesInput = document.createElement("textarea");
+    notesInput.className = "partnership-notes-input";
+    notesInput.rows = 3;
+    notesInput.maxLength = 2000;
+    notesInput.value = inquiry.internalNotes || "";
+    notesInput.placeholder = "Add private follow-up context, meeting notes, or next actions…";
+    notesInput.setAttribute("aria-label", "Internal notes for " + (inquiry.referenceId || inquiry.name));
+    notesLabel.appendChild(notesInput);
+
+    const followUpLabel = document.createElement("label");
+    followUpLabel.className = "partnership-detail-field";
+    followUpLabel.textContent = "Follow-up date";
+    const followUpInput = document.createElement("input");
+    followUpInput.type = "date";
+    followUpInput.className = "partnership-follow-up-input";
+    followUpInput.value = inquiry.followUpDate || "";
+    followUpInput.setAttribute("aria-label", "Follow-up date for " + (inquiry.referenceId || inquiry.name));
+    followUpLabel.appendChild(followUpInput);
+
+    const detailActions = document.createElement("div");
+    detailActions.className = "partnership-detail-actions";
+    const saveDetailsButton = document.createElement("button");
+    saveDetailsButton.type = "button";
+    saveDetailsButton.className = "primary-button";
+    saveDetailsButton.textContent = "Save notes & follow-up";
+    const detailFeedback = document.createElement("span");
+    detailFeedback.className = "partnership-status-feedback";
+    detailFeedback.setAttribute("role", "status");
+    saveDetailsButton.addEventListener("click", () => {
+      const all = readPartnershipInquiries();
+      const target = all.find((item) => String(item.id) === String(inquiry.id) || item.referenceId === inquiry.referenceId);
+      if (!target) {
+        detailFeedback.textContent = "Inquiry not found. Refresh the dashboard.";
+        return;
+      }
+      target.internalNotes = notesInput.value.trim();
+      target.followUpDate = followUpInput.value;
+      target.updatedAt = Date.now();
+      if (savePartnershipInquiries(all)) {
+        detailFeedback.textContent = "Saved · " + new Date(target.updatedAt).toLocaleString();
+        showToast("Internal notes and follow-up date saved on this device.");
+        renderPartnershipDashboard();
+        renderHistory();
+      }
+    });
+    detailActions.append(saveDetailsButton, detailFeedback);
+    detailBody.append(contact, messageLabel, notesLabel, followUpLabel, detailActions);
+    details.append(detailsSummary, detailBody);
+    if (inquiry.followUpDate) {
+      const followUpBadge = document.createElement("p");
+      followUpBadge.className = "partnership-follow-up-badge";
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const followDate = new Date(inquiry.followUpDate + "T00:00:00");
+      followUpBadge.textContent = (followDate < today ? "Follow-up overdue · " : "Follow-up scheduled · ") + followDate.toLocaleDateString();
+      card.append(top, statusRow, date, followUpBadge, details);
+    } else {
+      card.append(top, statusRow, date, details);
+    }
     partnershipDashboardList.appendChild(card);
   });
 }
+
+function csvSafeCell(value) {
+  let textValue = value === null || value === undefined ? "" : String(value);
+  // Prevent spreadsheet formula execution for values beginning with formula markers.
+  if (/^[\\s]*[=+@\\-]/.test(textValue)) textValue = "'" + textValue;
+  return '"' + textValue.replace(/"/g, '""').replace(/\\r?\\n/g, " ") + '"';
+}
+
+function exportPartnershipCsv() {
+  const inquiries = getFilteredPartnershipInquiries();
+  if (!inquiries.length) {
+    showToast("There are no matching inquiries to export.");
+    return;
+  }
+  const columns = [
+    ["Reference ID", "referenceId"], ["Name", "name"], ["Email", "email"],
+    ["Partnership category", "type"], ["Organization", "organization"],
+    ["Message", "message"], ["Status", "status"], ["Internal notes", "internalNotes"],
+    ["Follow-up date", "followUpDate"], ["Submitted at", "createdAt"], ["Last updated at", "updatedAt"]
+  ];
+  const rows = [columns.map(([label]) => csvSafeCell(label)).join(",")];
+  inquiries.forEach((item) => {
+    rows.push(columns.map(([, key]) => {
+      const value = key === "createdAt" || key === "updatedAt"
+        ? (item[key] ? new Date(item[key]).toISOString() : "")
+        : item[key];
+      return csvSafeCell(value);
+    }).join(","));
+  });
+  const csv = "\\uFEFF" + rows.join("\\r\\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "mindfull-partnership-inquiries-" + new Date().toISOString().slice(0, 10) + ".csv";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast("Exported " + inquiries.length + " matching inquiry record(s) to CSV.");
+}
+
+document.querySelector("#partnership-export-csv").addEventListener("click", exportPartnershipCsv);
 
 [partnershipDashboardSearch, partnershipDashboardCategory, partnershipDashboardStatus].forEach((control) => {
   control.addEventListener("input", renderPartnershipDashboard);
