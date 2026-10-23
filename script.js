@@ -662,6 +662,9 @@ const bookingDuration = document.querySelector("#booking-duration");
 const bookingPrice = document.querySelector("#booking-price");
 const bookingMentorSummary = document.querySelector("#booking-mentor-summary");
 const bookingConfirmationText = document.querySelector("#booking-confirmation-text");
+const bookingConfirmationTitle = document.querySelector("#booking-confirmation-title");
+const paymentCountdown = document.querySelector("#payment-countdown");
+const completeDemoPaymentButton = document.querySelector("#complete-demo-payment");
 const savedBookingsSection = document.querySelector("#saved-bookings");
 const savedBookingsList = document.querySelector("#saved-bookings-list");
 const bookingStorageKey = "mindfullCarrier.demoMentorRequests";
@@ -697,8 +700,18 @@ function readSavedBookings() {
   }
 }
 
-function renderSavedBookings() {
+function removeExpiredUnpaidBookings() {
+  const now = Date.now();
   const bookings = readSavedBookings();
+  const active = bookings.filter((booking) => booking.status === "paid" || (booking.status === "pending" && Number(booking.expiresAt) > now));
+  if (active.length !== bookings.length) {
+    try { localStorage.setItem(bookingStorageKey, JSON.stringify(active)); } catch (error) { /* Leave cleanup for the next visit if storage is unavailable. */ }
+  }
+  return active;
+}
+
+function renderSavedBookings() {
+  const bookings = removeExpiredUnpaidBookings().filter((booking) => booking.status === "paid");
   savedBookingsList.replaceChildren();
   savedBookingsSection.hidden = bookings.length === 0;
   bookings.forEach((booking) => {
@@ -711,7 +724,7 @@ function renderSavedBookings() {
     const goal = document.createElement("p");
     goal.textContent = "Goal: " + booking.goal;
     const status = document.createElement("p");
-    status.textContent = "Status: Demo only · No payment taken";
+    status.textContent = "Status: Demo payment completed · No real money charged";
     item.append(title, date, goal, status);
     savedBookingsList.appendChild(item);
   });
@@ -758,6 +771,9 @@ document.querySelector("#cancel-booking").addEventListener("click", () => {
   document.querySelector("#mentor-grid").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 document.querySelector("#new-booking").addEventListener("click", () => {
+  if (paymentCountdownInterval) window.clearInterval(paymentCountdownInterval);
+  paymentCountdownInterval = null;
+  activePendingBookingId = null;
   bookingConfirmation.hidden = true;
   bookingForm.hidden = false;
   bookingForm.reset();
@@ -790,7 +806,10 @@ bookingForm.addEventListener("submit", (event) => {
     showToast("Please complete every field before saving.");
     return;
   }
-  const bookings = readSavedBookings();
+  booking.createdAt = Date.now();
+  booking.expiresAt = booking.createdAt + 20 * 60 * 1000;
+  booking.status = "pending";
+  const bookings = readSavedBookings().filter((saved) => saved.status === "paid");
   bookings.unshift(booking);
   try {
     localStorage.setItem(bookingStorageKey, JSON.stringify(bookings.slice(0, 20)));
@@ -800,10 +819,88 @@ bookingForm.addEventListener("submit", (event) => {
   }
   bookingForm.hidden = true;
   bookingConfirmation.hidden = false;
-  bookingConfirmationText.textContent = "Your demo booking with " + booking.mentor + " is recorded for " + booking.date + " at " + booking.time + ". Session fee shown: ₹" + booking.price + ". No payment was taken and no real appointment has been made.";
-  renderSavedBookings();
+  bookingConfirmationTitle.textContent = "Complete your demo payment";
+  bookingConfirmationText.textContent = "Your request for " + booking.mentor + " on " + booking.date + " at " + booking.time + " is pending. Demo fee: ₹" + booking.price + ". Complete the demo payment within 20 minutes to keep it in your paid history.";
+  completeDemoPaymentButton.hidden = false;
+  startPaymentCountdown(booking.id);
   bookingConfirmation.scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
+let paymentCountdownInterval = null;
+let activePendingBookingId = null;
+
+function findPendingBooking(id) {
+  return readSavedBookings().find((booking) => booking.id === id && booking.status === "pending");
+}
+
+function expirePendingBooking(id) {
+  const remaining = readSavedBookings().filter((booking) => !(booking.id === id && booking.status === "pending"));
+  try { localStorage.setItem(bookingStorageKey, JSON.stringify(remaining)); } catch (error) { /* The expiry is checked again when the page next loads. */ }
+  if (paymentCountdownInterval) window.clearInterval(paymentCountdownInterval);
+  paymentCountdownInterval = null;
+  activePendingBookingId = null;
+  paymentCountdown.textContent = "Time expired. This unpaid request has been removed and will not appear in history.";
+  paymentCountdown.classList.remove("is-paid");
+  paymentCountdown.classList.add("is-expired");
+  bookingConfirmationTitle.textContent = "Payment window expired";
+  bookingConfirmationText.textContent = "The 20-minute window ended before the demo payment was completed. The request has been removed.";
+  completeDemoPaymentButton.hidden = true;
+  renderSavedBookings();
+}
+
+function startPaymentCountdown(id) {
+  if (paymentCountdownInterval) window.clearInterval(paymentCountdownInterval);
+  activePendingBookingId = id;
+  paymentCountdown.classList.remove("is-expired", "is-paid");
+  function tick() {
+    const booking = findPendingBooking(id);
+    if (!booking) {
+      if (paymentCountdownInterval) window.clearInterval(paymentCountdownInterval);
+      paymentCountdownInterval = null;
+      return;
+    }
+    const remainingMs = Number(booking.expiresAt) - Date.now();
+    if (remainingMs <= 0) {
+      expirePendingBooking(id);
+      return;
+    }
+    const totalSeconds = Math.ceil(remainingMs / 1000);
+    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
+    paymentCountdown.textContent = "Time left to complete demo payment: " + minutes + ":" + seconds;
+  }
+  tick();
+  paymentCountdownInterval = window.setInterval(tick, 1000);
+}
+
+completeDemoPaymentButton.addEventListener("click", () => {
+  if (!activePendingBookingId) return;
+  const bookings = readSavedBookings();
+  const booking = bookings.find((saved) => saved.id === activePendingBookingId && saved.status === "pending");
+  if (!booking) return;
+  if (Date.now() >= Number(booking.expiresAt)) {
+    expirePendingBooking(booking.id);
+    return;
+  }
+  booking.status = "paid";
+  booking.paidAt = Date.now();
+  try {
+    localStorage.setItem(bookingStorageKey, JSON.stringify(bookings));
+  } catch (error) {
+    showToast("Could not save the demo payment status. Please try again.");
+    return;
+  }
+  if (paymentCountdownInterval) window.clearInterval(paymentCountdownInterval);
+  paymentCountdownInterval = null;
+  activePendingBookingId = null;
+  paymentCountdown.textContent = "Demo payment completed in time. This request is now kept in your history.";
+  paymentCountdown.classList.remove("is-expired");
+  paymentCountdown.classList.add("is-paid");
+  bookingConfirmationTitle.textContent = "Demo payment successful!";
+  bookingConfirmationText.textContent = "Your simulated payment of ₹" + booking.price + " is marked complete. No real money was charged and no real appointment was booked.";
+  completeDemoPaymentButton.hidden = true;
+  renderSavedBookings();
+});
+
 document.querySelector("#clear-bookings").addEventListener("click", () => {
   try {
     localStorage.removeItem(bookingStorageKey);
@@ -814,4 +911,6 @@ document.querySelector("#clear-bookings").addEventListener("click", () => {
   }
 });
 
+// Clean up unpaid requests that expired while the page was closed; paid history remains.
+removeExpiredUnpaidBookings();
 console.log("MindFull Carrier Step 3 loaded successfully.");
