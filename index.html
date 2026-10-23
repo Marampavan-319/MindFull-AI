@@ -334,13 +334,52 @@
 
     <section class="partnership-screen" id="partnership-screen" hidden>
       <a class="back-link" href="#" data-view="home">← Back to choices</a>
-      <div class="partnership-panel">
-        <span class="choice-icon partnership-symbol" aria-hidden="true">✳</span>
-        <span class="eyebrow">LET'S BUILD SOMETHING MEANINGFUL</span>
-        <h1>Partnership opportunities are coming soon.</h1>
-        <p>We're focusing on building a useful career-guidance experience first. This space will later help mentors, organizations, and collaborators explore ways to work with MindFull Carrier.</p>
-        <button class="primary-button" type="button" data-view="home">Back to Guidance &amp; Partnership</button>
+      <div class="partnership-hero">
+        <div class="partnership-hero-copy">
+          <span class="eyebrow">✦ GROW WITH MINDFULL AI</span>
+          <h1>Better futures are built <span>together.</span></h1>
+          <p>Partner with MindFull AI to help learners discover opportunities, build real-world skills, and take confident next steps.</p>
+          <a class="primary-button" href="#partnership-form">Let's collaborate <span aria-hidden="true">→</span></a>
+          <p class="partnership-prototype-note">This is a demo inquiry form. Submissions are saved in this browser only; no email is sent.</p>
+        </div>
+        <div class="partnership-hero-art" aria-hidden="true">
+          <div class="partner-orbit orbit-one"></div><div class="partner-orbit orbit-two"></div>
+          <div class="partner-center">M<span>✦</span></div>
+          <span class="partner-node node-one">🎓</span><span class="partner-node node-two">🤝</span><span class="partner-node node-three">🚀</span><span class="partner-node node-four">💡</span>
+        </div>
       </div>
+      <section class="partnership-section">
+        <div class="section-heading">
+          <div><span class="eyebrow">WAYS TO WORK TOGETHER</span><h2>Find your kind of partnership.</h2><p>Choose the collaboration that best matches what you want to contribute.</p></div>
+        </div>
+        <div class="partnership-opportunity-grid">
+          <article class="partnership-opportunity"><span class="partnership-opportunity-icon">🎓</span><h3>Colleges &amp; universities</h3><p>Bring career exploration, student skill-building, and practical guidance into campus communities.</p><button class="text-link partnership-type-button" type="button" data-partner-type="College or university">Explore this option →</button></article>
+          <article class="partnership-opportunity"><span class="partnership-opportunity-icon">🧑‍🏫</span><h3>Mentors &amp; professionals</h3><p>Share industry experience, support learners, and help them understand real-world career paths.</p><button class="text-link partnership-type-button" type="button" data-partner-type="Mentor or professional">Explore this option →</button></article>
+          <article class="partnership-opportunity"><span class="partnership-opportunity-icon">🏢</span><h3>Companies &amp; recruiters</h3><p>Help learners understand job expectations, project skills, internships, and entry-level opportunities.</p><button class="text-link partnership-type-button" type="button" data-partner-type="Company or recruiter">Explore this option →</button></article>
+          <article class="partnership-opportunity"><span class="partnership-opportunity-icon">🌱</span><h3>Community &amp; organizations</h3><p>Collaborate on workshops, learning resources, outreach, and access to career information.</p><button class="text-link partnership-type-button" type="button" data-partner-type="Community or organization">Explore this option →</button></article>
+        </div>
+      </section>
+      <section class="partnership-section partnership-process-section">
+        <div class="section-heading"><div><span class="eyebrow">SIMPLE START, SHARED PURPOSE</span><h2>How collaboration begins.</h2><p>Start with a conversation and build from there.</p></div></div>
+        <div class="partnership-process-grid">
+          <article class="partner-process-card"><span>01</span><h3>Tell us about your idea</h3><p>Share who you are, who you support, and what you would like to explore.</p></article>
+          <article class="partner-process-card"><span>02</span><h3>Find a shared goal</h3><p>Identify a practical way to help learners or strengthen career readiness.</p></article>
+          <article class="partner-process-card"><span>03</span><h3>Plan a small pilot</h3><p>Outline a manageable first step, then learn and improve together.</p></article>
+        </div>
+      </section>
+      <section class="partnership-form-panel" id="partnership-form">
+        <div class="partnership-form-intro"><span class="eyebrow">START A CONVERSATION</span><h2>Tell us how you'd like to partner.</h2><p>Share a few details so the idea is easy to understand. This prototype stores your inquiry locally for demonstration.</p><div class="partner-promise"><span>✓</span><p>No commitment required. This form does not create a formal agreement or send your details anywhere.</p></div></div>
+        <form id="partnership-inquiry-form" class="partnership-inquiry-form">
+          <label>Your name<input id="partner-name" name="name" type="text" required maxlength="80" autocomplete="name" placeholder="Your full name"></label>
+          <label>Work or contact email<input id="partner-email" name="email" type="email" required maxlength="120" autocomplete="email" placeholder="you@organization.com"></label>
+          <label>I'm interested as a<select id="partner-type" name="type" required><option value="">Choose a partnership type</option><option>College or university</option><option>Mentor or professional</option><option>Company or recruiter</option><option>Community or organization</option><option>Other collaboration</option></select></label>
+          <label>Organization or group <span class="optional-label">(optional)</span><input id="partner-organization" name="organization" type="text" maxlength="120" placeholder="Organization name"></label>
+          <label class="partner-message-label">What would you like to collaborate on?<textarea id="partner-message" name="message" required minlength="10" maxlength="1200" rows="4" placeholder="Tell us about your idea, audience, or the opportunity you'd like to explore..."></textarea></label>
+          <p class="partner-form-feedback" id="partner-form-feedback" role="status" aria-live="polite"></p>
+          <button class="primary-button" type="submit">Save demo inquiry <span aria-hidden="true">→</span></button>
+        </form>
+        <div class="partnership-success" id="partnership-success" hidden role="status" aria-live="polite"><span class="partnership-success-mark">✓</span><h3>Thanks for sharing your idea!</h3><p id="partnership-success-text"></p><p class="partnership-prototype-note">Demo only: your inquiry is stored in this browser and has not been sent to MindFull AI.</p><button class="secondary-button" type="button" id="new-partnership-inquiry">Submit another inquiry</button></div>
+      </section>
     </section>
   </main>
 
