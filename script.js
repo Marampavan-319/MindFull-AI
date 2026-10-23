@@ -469,17 +469,34 @@ document.querySelector("#close-chat").addEventListener("click", () => {
 
 function getChatReply(question) {
   const text = question.toLowerCase();
-  if (/internship|intern|experience/.test(text)) return "Start by choosing one role or skill area. Build a small related project, prepare a one-page resume, and apply through company career pages and trusted internship platforms. Check each opportunity carefully before sharing personal information.";
+  const pathContext = selectedCategory
+    ? " Since you last selected " + categoryNames[selectedCategory] + ", you can use that as your current focus—or explore another path if your interests have changed."
+    : "";
+
+  if (/roadmap|plan my career|career plan|where do i start/.test(text)) {
+    return "Let's make a simple 7-day starter roadmap:\n1. Day 1: choose one goal and write why it matters.\n2. Days 2–3: learn one core skill for 30–45 minutes each day.\n3. Days 4–5: practise that skill with a tiny task or project.\n4. Day 6: ask someone for feedback.\n5. Day 7: review progress and choose the next small goal." + pathContext;
+  }
+  if (/interview|internship prep|prepare for an internship/.test(text)) {
+    return "Try this interview-prep checklist:\n1. Practise introducing yourself in 45–60 seconds.\n2. Revise fundamentals for the role.\n3. Be ready to explain one project: problem, your contribution, tools, challenge, and result.\n4. Practise a few questions aloud.\n5. Ask the recruiter thoughtful questions. Be honest when you don't know something.";
+  }
+  if (/project idea|project ideas|practical project|build a project/.test(text)) {
+    return "Pick a small project you can finish and demonstrate:\n• Web development: a task tracker with add, complete, and delete actions.\n• Python: a CSV data summary tool.\n• SQL: a student/course database with joins and constraints.\n• AI/data: a small text sentiment explorer with clear limitations.\nStart with one working feature, test it, and write a README explaining your own work.";
+  }
+  if (/choose between|help me choose|career path|which career|confused|don't know|dont know/.test(text)) {
+    return "You don't have to decide your whole future today. Compare options using four questions: What tasks interest me? What skills am I willing to practise? What constraints matter (time, cost, location)? What small experiment can I try this week? Explore one path at a time and review what you learn." + pathContext;
+  }
+  if (/free resource|free course|learn for free|resources/.test(text)) {
+    return "For free learning, start with official documentation and structured beginner material: MDN Web Docs for web development, the Python Tutorial at docs.python.org for Python, and SQLBolt for interactive SQL practice. Prefer one resource at a time, practise as you learn, and verify course or exam details on official sites.";
+  }
+  if (/internship|intern\b|experience/.test(text)) return "Start by choosing one role or skill area. Build a small related project, prepare a one-page resume, and apply through company career pages and trusted internship platforms. Check each opportunity carefully before sharing personal information.";
   if (/resume|cv|portfolio|github/.test(text)) return "Keep your resume concise and truthful. Pin 2–3 projects, add a clear README to each repository, explain your own contribution, and include working demos when possible. Never list skills you cannot discuss in an interview.";
   if (/skill|learn|programming|coding|developer/.test(text)) return "Choose one target role and learn its core skills in small steps. Practise fundamentals, build a tiny project, explain your code aloud, and repeat. Consistent practice is usually more useful than collecting many unfinished courses.";
   if (/higher stud|master|m.?s.?|m.?tech|college|university|research/.test(text)) return "Compare programs by curriculum, eligibility, cost, faculty or research fit, and career outcomes. Verify requirements and deadlines on official institution websites before making decisions.";
   if (/government|govt|exam|civil service|banking|railway/.test(text)) return "First compare eligibility, syllabus, exam stages, and the time you can prepare. Use official recruitment notifications for dates and rules, then build a steady plan with revision and practice tests.";
   if (/business|entrepreneur|startup|customer|idea/.test(text)) return "Start with the problem, not just the product idea. Talk to potential users, check how they solve it today, test a small version, and estimate costs before making a large investment.";
-  if (/confused|don't know|dont know|choose|career path|what should i do/.test(text)) return "It's okay not to know yet. Pick one small experiment: explore a role, speak to someone doing that work, or build a tiny project. Notice what interests you and what skills you want to practise next.";
-  if (/hello|hi|hey/.test(text)) return "Hey! 👋 Tell me what you're exploring—jobs, college skills, government exams, higher studies, or a business idea—and I'll share a practical starting point.";
-  return "I can help with basic guidance about internships, resumes and GitHub, learning skills, higher studies, government exams, and starting a business. Try asking about one of those topics. For exact deadlines, eligibility, or official rules, check the relevant official source.";
+  if (/hello|hi\b|hey/.test(text)) return "Hey! 👋 Tell me what you're exploring—jobs, college skills, government exams, higher studies, or a business idea—and I'll share a practical starting point.";
+  return "I can help with career roadmaps, interview preparation, project ideas, resumes and GitHub, learning skills, higher studies, government exams, and entrepreneurship. Ask me about one specific goal and I'll suggest a practical next step." + pathContext;
 }
-
 function addChatMessage(message, type) {
   const bubble = document.createElement("div");
   bubble.className = "chat-bubble " + (type === "user" ? "user-bubble" : "bot-bubble");
@@ -487,14 +504,22 @@ function addChatMessage(message, type) {
   chatMessages.appendChild(bubble);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
-document.querySelector("#chat-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const question = chatInput.value.trim();
-  if (!question) return;
-  addChatMessage(question, "user");
-  addChatMessage(getChatReply(question), "bot");
+function sendChatQuestion(question) {
+  const cleanedQuestion = question.trim();
+  if (!cleanedQuestion) return;
+  addChatMessage(cleanedQuestion, "user");
+  addChatMessage(getChatReply(cleanedQuestion), "bot");
   chatInput.value = "";
   chatInput.focus();
+}
+
+document.querySelector("#chat-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  sendChatQuestion(chatInput.value);
+});
+
+document.querySelectorAll("[data-prompt]").forEach((button) => {
+  button.addEventListener("click", () => sendChatQuestion(button.dataset.prompt));
 });
 
 console.log("MindFull Carrier Step 2 loaded successfully.");
