@@ -1471,34 +1471,19 @@ function savePartnershipInquiries(inquiries) {
   }
 }
 
-function normalizePartnershipSearchText(value) {
-  return String(value ?? "")
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase()
-    .trim();
-}
-
 function getFilteredPartnershipInquiries() {
-  // Normalize both the typed query and saved values so name searches are
-  // case-insensitive and tolerate extra spaces or accented characters.
-  const query = normalizePartnershipSearchText(partnershipDashboardSearch?.value || "");
+  // Email-only, case-sensitive search: the typed text must match the saved
+  // email exactly in capitalization (for example, Ravi@Example.com differs
+  // from ravi@example.com). Category and status filters still apply.
+  const query = String(partnershipDashboardSearch?.value || "").trim();
   const category = partnershipDashboardCategory?.value || "all";
   const statusFilter = partnershipDashboardStatus?.value || "all";
 
   return readPartnershipInquiries()
     .sort((a, b) => Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0))
     .filter((item) => {
-      const searchable = normalizePartnershipSearchText([
-        item.referenceId,
-        item.name,
-        item.email,
-        item.organization,
-        item.type,
-        item.message,
-        item.internalNotes
-      ].filter((value) => value !== null && value !== undefined).join(" "));
-      return (!query || searchable.includes(query)) &&
+      const email = String(item.email || "");
+      return (!query || email.includes(query)) &&
         (category === "all" || item.type === category) &&
         (statusFilter === "all" || item.status === statusFilter);
     });
