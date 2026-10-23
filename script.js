@@ -1265,3 +1265,61 @@ signoutButton.addEventListener("click", () => {
 });
 
 restoreAuthSession();
+
+
+// Partnership inquiries are prototype-only and remain in this browser.
+const partnershipInquiryForm = document.querySelector("#partnership-inquiry-form");
+const partnershipSuccess = document.querySelector("#partnership-success");
+const partnershipSuccessText = document.querySelector("#partnership-success-text");
+const partnershipFeedback = document.querySelector("#partner-form-feedback");
+const partnershipInquiryStorageKey = "mindfullCarrier.partnershipInquiries";
+
+document.querySelectorAll("[data-partner-type]").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelector("#partner-type").value = button.dataset.partnerType;
+    document.querySelector("#partnership-form").scrollIntoView({ behavior: "smooth", block: "start" });
+    document.querySelector("#partner-type").focus({ preventScroll: true });
+  });
+});
+
+partnershipInquiryForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  partnershipFeedback.textContent = "";
+  partnershipFeedback.classList.remove("success");
+  if (!partnershipInquiryForm.reportValidity()) return;
+  const inquiry = {
+    id: Date.now(),
+    name: document.querySelector("#partner-name").value.trim(),
+    email: document.querySelector("#partner-email").value.trim(),
+    type: document.querySelector("#partner-type").value,
+    organization: document.querySelector("#partner-organization").value.trim(),
+    message: document.querySelector("#partner-message").value.trim(),
+    createdAt: Date.now()
+  };
+  if (inquiry.name.length < 2 || inquiry.message.length < 10) {
+    partnershipFeedback.textContent = "Please add your name and a little more detail about the collaboration.";
+    return;
+  }
+  let saved = [];
+  try {
+    saved = JSON.parse(localStorage.getItem(partnershipInquiryStorageKey) || "[]");
+    if (!Array.isArray(saved)) saved = [];
+    saved.unshift(inquiry);
+    localStorage.setItem(partnershipInquiryStorageKey, JSON.stringify(saved.slice(0, 50)));
+  } catch (error) {
+    partnershipFeedback.textContent = "This browser could not save your inquiry. Check storage settings and try again.";
+    return;
+  }
+  partnershipInquiryForm.hidden = true;
+  partnershipSuccess.hidden = false;
+  partnershipSuccessText.textContent = "Your demo inquiry as " + inquiry.type + " has been saved on this device. You can see the confirmation here, but it has not been emailed or sent to a team.";
+  partnershipSuccess.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+document.querySelector("#new-partnership-inquiry").addEventListener("click", () => {
+  partnershipInquiryForm.reset();
+  partnershipInquiryForm.hidden = false;
+  partnershipSuccess.hidden = true;
+  partnershipFeedback.textContent = "";
+  document.querySelector("#partnership-form").scrollIntoView({ behavior: "smooth", block: "start" });
+});
